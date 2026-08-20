@@ -1,0 +1,6 @@
+/* Aggregate stylesheet — imports split partials */
+@import "./base/base.css";
+@import "./layout/layout.css";
+@import "./components/media.css";
+@import "./pages/embed.css";
+@import "./pages/receiver.css";
