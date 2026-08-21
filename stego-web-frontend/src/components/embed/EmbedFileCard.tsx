@@ -5,15 +5,16 @@ import {
   FileText,
   Check,
   LoaderCircle,
+  type LucideIcon,
 } from "lucide-react";
 
-import type { EmbedFile } from "../../types/embed";
+import type { EmbedFile, MediaType } from "../../types/embed";
 
 interface EmbedFileCardProps {
   file: EmbedFile;
 }
 
-const ICONS = {
+const ICONS: Record<MediaType, LucideIcon> = {
   image: Image,
   video: Video,
   audio: Music,

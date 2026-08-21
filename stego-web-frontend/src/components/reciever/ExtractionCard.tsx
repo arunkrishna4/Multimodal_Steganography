@@ -10,12 +10,18 @@ interface ExtractionCardProps {
   isExtracting: boolean;
   isExtracted: boolean;
   onExtract: () => void;
+  extractedMessage: string;
+  totalParts: number;
+  onCompare: () => void;
 }
 
 export const ExtractionCard = ({
   items,
   isExtracting,
   isExtracted,
+  extractedMessage,
+  totalParts,
+  onCompare,
 }: ExtractionCardProps) => {
   return (
     <section className="receiver-card">
@@ -44,7 +50,13 @@ export const ExtractionCard = ({
         ))}
       </div>
 
-      {isExtracted && <ExtractedMessageCard />}
+      {isExtracted && (
+        <ExtractedMessageCard
+          message={extractedMessage}
+          totalParts={totalParts}
+          onCompare={onCompare}
+        />
+      )}
     </section>
   );
 };
