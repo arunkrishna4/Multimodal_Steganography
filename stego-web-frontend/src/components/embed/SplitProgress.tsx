@@ -1,12 +1,12 @@
-import { Image, Video, Music, FileText } from "lucide-react";
+import { Image, Video, Music, FileText, type LucideIcon } from "lucide-react";
 
-import type { EmbedFile } from "../../types/embed";
+import type { EmbedFile, MediaType } from "../../types/embed";
 
 interface SplitProgressProps {
   files: EmbedFile[];
 }
 
-const ICONS = {
+const ICONS: Record<MediaType, LucideIcon> = {
   image: Image,
   video: Video,
   audio: Music,
