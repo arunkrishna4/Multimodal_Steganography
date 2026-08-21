@@ -27,6 +27,13 @@ export const EmbedFileCard = ({ file }: EmbedFileCardProps) => {
   const isDone = file.status === "done";
   const isProcessing = file.status === "processing";
 
+  const qualityMetric =
+    file.mediaType === "image"
+      ? { label: "PSNR", value: "20.5 dB" }
+      : file.mediaType === "audio"
+        ? { label: "SNR", value: "20.5 dB" }
+        : null;
+
   return (
     <div className={`embed-file-card ${isDone ? "embed-file-done" : ""}`}>
       <div className="embed-file-main">
@@ -37,20 +44,20 @@ export const EmbedFileCard = ({ file }: EmbedFileCardProps) => {
         <div className="embed-file-details">
           <strong>{capitalize(file.fileName)}</strong>
 
-          <span>Method: {file.methodName}</span>
+          <div className="embed-file-meta">
+            <div className="detailsbox">
+              <span className="meta-label">Method</span>
+              <span className="meta-value">{file.methodName}</span>
+            </div>
 
-          {file.mediaType === "image" && (
-            <span>
-              PSNR: 20.5 dB
-            </span>
-          )}
-          {file.mediaType === "audio" && (
-            <span>
-              SNR: 20.5 dB
-            </span>
-          )}
+            {qualityMetric && (
+              <div className="detailsbox">
+                <span className="meta-label">{qualityMetric.label}</span>
+                <span className="meta-value">{qualityMetric.value}</span>
+              </div>
+            )}
+          </div>
         </div>
-
       </div>
 
       <div className="embed-status">

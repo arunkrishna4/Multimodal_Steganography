@@ -51,7 +51,7 @@ export const SecretFileUpload = ({
         ) : (
           <div className="secret-file">
             <div className="secret-file-icon">
-              <FileCheck size={22} />
+              <FileCheck size={24} />
             </div>
 
             <div className="secret-file-info">

@@ -144,18 +144,16 @@ export const ConfigureUpload = () => {
 
       {embeded && splitInfo ? (
         <div className="Results">
-
-
           <div style={{ marginTop: 20 }}>
-            {embedFiles.length == 1 ? (
-              <div></div>
-            ) : (
-              <SplitSummary splitInfo={splitInfo} />
+            {/* // splitprogress is still visible after the condition */}
+            {embedFiles.length !== 1 && (
+              <>
+                <SplitSummary splitInfo={splitInfo} />
+                <div style={{ marginTop: 20 }}>
+                  <SplitProgress files={embedFiles} />
+                </div>
+              </>
             )}
-          </div>
-
-          <div style={{ marginTop: 20 }}>
-            <SplitProgress files={embedFiles} />
           </div>
 
           <div className="OuterEmbedFileCard">

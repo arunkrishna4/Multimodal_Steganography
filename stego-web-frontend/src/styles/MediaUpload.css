@@ -292,17 +292,17 @@
 }
 
 .secret-file-info strong {
-  font-size: 12px;
+  font-size: 14px;
   color: #24753c;
 }
 
 .secret-file-info span {
-  font-size: 11px;
+  font-size: 13px;
   color: #45925a;
 }
 
 .change-label {
   color: #2c9148;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 600;
 }
