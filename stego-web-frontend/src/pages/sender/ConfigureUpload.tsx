@@ -6,12 +6,15 @@ import { SecretFileUpload } from "../../components/sender/SecretFileUpload";
 import { ContinueButton } from "../../components/sender/ContinueButton";
 
 import { useSenderSetup } from "../../hooks/useSenderSetup";
+import { EmbedSuccess } from "../../components/embed/EmbedSuccess";
+import { EmbedFileCard } from "../../components/embed/EmbedFileCard";
+import { SplitSummary } from "../../components/embed/SplitSummary";
 
-interface ConfigureUploadProps {
-  onContinue: () => void;
-}
+import type { EmbedFile } from "../../types/embed";
+import type { MediaType } from "../../types/steganography";
+import { SplitProgress } from "../../components/embed/SplitProgress";
 
-export const ConfigureUpload = ({ onContinue }: ConfigureUploadProps) => {
+export const ConfigureUpload = () => {
   const {
     selectedMethods,
     uploadedFiles,
@@ -23,8 +26,37 @@ export const ConfigureUpload = ({ onContinue }: ConfigureUploadProps) => {
     uploadMediaFile,
     uploadSecretFile,
 
+    embeded,
+    isEmbeded,
+
     isReadyToContinue,
   } = useSenderSetup();
+
+  // Build one EmbedFile entry per uploaded carrier file
+  const embedFiles: EmbedFile[] = selectedMethods.flatMap((item) => {
+    const filesForType = uploadedFiles.filter(
+      (file) => getMediaType(file) === item.mediaType,
+    );
+
+    return filesForType.map((file, index) => ({
+      id: `${item.mediaType}-${index}`,
+      fileName: file.name,
+      bytes: file.size,
+      percentage: 100, // set dynamically once real embed progress is wired up
+      mediaType: item.mediaType,
+      methodName: item.methodId, // swap for a display-name lookup if you have one
+      status: "done" as const,
+    }));
+  });
+
+  const splitInfo = secretFile
+    ? {
+      secretFileName: secretFile.name,
+      secretFileSize: secretFile.size,
+      totalParts: embedFiles.length || 1,
+      files: embedFiles,
+    }
+    : null;
 
   return (
     <div className="sender-page">
@@ -95,20 +127,50 @@ export const ConfigureUpload = ({ onContinue }: ConfigureUploadProps) => {
           BOTTOM ACTION AREA
           ========================= */}
 
-      <div className="sender-bottom-area">
-        <div className="secret-upload-wrapper">
-          <SecretFileUpload file={secretFile} onUpload={uploadSecretFile} />
-        </div>
 
-        <div className="continue-wrapper">
-          <ContinueButton disabled={!isReadyToContinue} onClick={onContinue} />
-        </div>
+      <div className="secret-upload-wrapper">
+        <SecretFileUpload file={secretFile} onUpload={uploadSecretFile} />
       </div>
+
+      <div className="continue-wrapper">
+        <ContinueButton
+          disabled={!isReadyToContinue}
+          onClick={() => {
+            isEmbeded(true);
+          }}
+        />
+      </div>
+
+
+      {embeded && splitInfo ? (
+        <div className="Results">
+
+
+          <div style={{ marginTop: 20 }}>
+            {embedFiles.length == 1 ? (
+              <div></div>
+            ) : (
+              <SplitSummary splitInfo={splitInfo} />
+            )}
+          </div>
+
+          <div style={{ marginTop: 20 }}>
+            <SplitProgress files={embedFiles} />
+          </div>
+
+          <div className="OuterEmbedFileCard">
+            {embedFiles.map((file) => (
+              <EmbedFileCard key={file.id} file={file} />
+            ))}
+          </div>
+          <EmbedSuccess fileCount={embedFiles.length} />
+        </div>
+      ) : null}
     </div>
   );
 };
 
-const getMediaType = (file: File): "image" | "video" | "audio" | "text" => {
+const getMediaType = (file: File): MediaType => {
   if (file.type.startsWith("image/")) {
     return "image";
   }

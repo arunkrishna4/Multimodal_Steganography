@@ -1,6 +1,7 @@
 import { Image, Video, Music, FileText, Upload } from "lucide-react";
 import { useEffect, useMemo } from "react";
 
+import "../../styles/MediaUpload.css";
 import type { MediaType } from "../../types/steganography";
 
 interface MediaUploadCardProps {
@@ -83,9 +84,8 @@ export const MediaUploadCard = ({
 
   return (
     <div
-      className={`media-upload-card ${
-        uploadedFile ? "media-upload-card-uploaded" : ""
-      }`}
+      className={`media-upload-card ${uploadedFile ? "media-upload-card-uploaded" : ""
+        }`}
     >
       <div className="media-upload-header">
         <div className="media-upload-icon">{getIcon()}</div>
@@ -102,7 +102,9 @@ export const MediaUploadCard = ({
       </div>
 
       {uploadedFile ? (
-        <div className={`uploaded-file-preview ${isAudio ? "audio-uploaded" : ""}`}>
+        <div
+          className={`uploaded-file-preview ${isAudio ? "audio-uploaded" : ""}`}
+        >
           {(isImage || isVideo) && (
             <div className="media-preview">
               {isImage && <img src={fileUrl} alt={uploadedFile.name} />}

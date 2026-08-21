@@ -20,6 +20,7 @@
 }
 
 .embed-card {
+
   background: #ffffff;
   border: 1px solid #e6ddd5;
   border-radius: 18px;
@@ -198,6 +199,8 @@
   border: 1px solid #e5ddd7;
   border-radius: 13px;
   background: #fff;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 .embed-file-done {
@@ -338,6 +341,14 @@
 .embed-back-button:hover {
   border-color: #c76532;
   color: #c76532;
+}
+
+.OuterEmbedFileCard {
+  margin-top: 20px;
+  box-shadow: #16823c;
+  background-color: rgb(255, 255, 255);
+  padding: 15px;
+  border-radius: 20px;
 }
 
 /* LOADING */

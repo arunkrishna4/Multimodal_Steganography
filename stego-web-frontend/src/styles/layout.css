@@ -15,7 +15,7 @@
     padding: 4px 0 28px;
   }
 
-  .brand > div:last-child,
+  .brand>div:last-child,
   .nav-item span,
   .sidebar-help p {
     display: none;
@@ -37,7 +37,8 @@
     padding: 30px 22px;
   }
 }
-  /* =========================
+
+/* =========================
    SENDER WORKFLOW
    ========================= */
 
@@ -210,7 +211,7 @@
   margin-left: 64px;
 }
 
-.method-selector > div {
+.method-selector>div {
   flex: 1;
   min-width: 0;
 }
@@ -288,6 +289,7 @@
 
 .secret-upload-wrapper,
 .continue-wrapper {
+  margin-top: 20px;
   width: 100%;
 }
 
@@ -308,6 +310,7 @@
   cursor: pointer;
   box-shadow: 0 7px 18px rgba(199, 101, 50, 0.2);
   transition: 0.2s ease;
+  margin-top: 20px;
 }
 
 .continue-button:hover:not(:disabled) {

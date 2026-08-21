@@ -9,6 +9,8 @@ export const useSenderSetup = () => {
 
   const [secretFile, setSecretFile] = useState<File | null>(null);
 
+  const [embeded, isEmbeded] = useState(false);
+
   const toggleMediaType = (mediaType: MediaType) => {
     setSelectedMethods((current) => {
       const exists = current.some((item) => item.mediaType === mediaType);
@@ -22,7 +24,6 @@ export const useSenderSetup = () => {
         {
           mediaType,
           methodId: "",
-          methodName: "",
           numberOfFiles: 1,
         },
       ];
@@ -39,7 +40,6 @@ export const useSenderSetup = () => {
         return {
           ...item,
           methodId,
-          methodName: methodId,
         };
       }),
     );
@@ -64,18 +64,31 @@ export const useSenderSetup = () => {
 
   const uploadMediaFile = (mediaType: MediaType, file: File, index = 0) => {
     setUploadedFiles((current) => {
-      const sameTypeFiles = current.filter((item) => getMediaType(item) === mediaType);
-      const otherFiles = current.filter((item) => getMediaType(item) !== mediaType);
+      const sameTypeFiles = current.filter(
+        (item) => getMediaType(item) === mediaType,
+      );
+      const otherFiles = current.filter(
+        (item) => getMediaType(item) !== mediaType,
+      );
       const nextFiles = [...sameTypeFiles];
 
       nextFiles[index] = file;
 
       return [...otherFiles, ...nextFiles];
     });
+
+    // Uploading a new file invalidates any previous embed result
+    if (embeded) {
+      isEmbeded(false);
+    }
   };
 
   const uploadSecretFile = (file: File) => {
     setSecretFile(file);
+
+    if (embeded) {
+      isEmbeded(false);
+    }
   };
 
   const isReadyToContinue = useMemo(() => {
@@ -116,6 +129,9 @@ export const useSenderSetup = () => {
     changeNumberOfFiles,
     uploadMediaFile,
     uploadSecretFile,
+
+    embeded,
+    isEmbeded,
 
     isReadyToContinue,
   };

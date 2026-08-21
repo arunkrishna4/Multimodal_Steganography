@@ -1,5 +1,5 @@
 import { CheckCircle2 } from "lucide-react";
-
+import "../../styles/SplitEmbed.css";
 interface EmbedSuccessProps {
   fileCount: number;
 }

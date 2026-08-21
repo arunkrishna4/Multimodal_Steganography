@@ -1,16 +1,19 @@
+// types/embed.ts (inferred shape — verify against your actual file)
+export type MediaType = string;
+
 export interface EmbedFile {
   id: string;
-  mediaType: "image" | "video" | "audio" | "text";
   fileName: string;
-  methodName: string;
   bytes: number;
-  percentage: number;
-  status: "pending" | "processing" | "done" | "error";
+  percentage: number; // embed progress, 0–100
+  mediaType: MediaType;
+  methodName: string;
+  status: "pending" | "processing" | "done";
 }
 
 export interface SplitInfo {
   secretFileName: string;
   secretFileSize: number;
   totalParts: number;
-  files: EmbedFile[];
+  files: EmbedFile[]; // per-file breakdown of the split
 }

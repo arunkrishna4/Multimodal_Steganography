@@ -4,7 +4,8 @@
 
 .media-upload-card {
   flex: 1 1 260px;
-  min-width: 220px;
+  min-width: 320px;
+  height: 100%;
   display: flex;
   flex-direction: column;
   border: 1px solid #e6ddd5;
@@ -54,6 +55,7 @@
 }
 
 .media-upload-dropzone {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -86,9 +88,11 @@
 }
 
 .uploaded-file-preview {
+  flex: 1;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 14px;
   margin-top: 15px;
   padding: 16px;
@@ -100,13 +104,14 @@
 .uploaded-file-preview.audio-uploaded {
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 10px;
 }
 
 .uploaded-file-preview.audio-uploaded .audio-preview {
   flex: 0 1 auto;
   width: 100%;
-  
+
 }
 
 .uploaded-file-preview.audio-uploaded .uploaded-file-details,
@@ -140,18 +145,14 @@
 }
 
 .audio-preview {
-  flex: 1 1 280px;
-  min-width: 240px;
-  min-height: 60px;
+  width: 100%;
   display: flex;
   align-items: center;
-  padding: 12px 10px;
-  border-radius: 12px;
-  background: #fff7f2;
 }
 
 .audio-preview audio {
   width: 100%;
+  accent-color: #c76532;
 }
 
 .uploaded-file-details {
@@ -230,9 +231,11 @@
 /* SECRET FILE */
 .secret-card {
   margin-top: 0;
+
   border-color: #e3d5ca;
   background: #fffdfb;
 }
+
 .secret-card .section-icon {
   background: #f6e4d5;
 }

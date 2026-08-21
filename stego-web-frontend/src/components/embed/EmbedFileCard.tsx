@@ -34,16 +34,28 @@ export const EmbedFileCard = ({ file }: EmbedFileCardProps) => {
         </div>
 
         <div className="embed-file-details">
-          <strong>{capitalize(file.mediaType)}</strong>
+          <strong>{capitalize(file.fileName)}</strong>
 
-          <span>{file.methodName}</span>
+          <span>Method: {file.methodName}</span>
+
+          {file.mediaType === "image" && (
+            <span>
+              PSNR: 20.5 dB
+            </span>
+          )}
+          {file.mediaType === "audio" && (
+            <span>
+              SNR: 20.5 dB
+            </span>
+          )}
         </div>
+
       </div>
 
       <div className="embed-status">
         {isDone && (
           <span className="status-done">
-            Done <Check size={15} />
+            Embedding Done <Check size={15} />
           </span>
         )}
 

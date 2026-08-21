@@ -1,3 +1,5 @@
+import { IoMdGitNetwork } from "react-icons/io";
+
 interface ContinueButtonProps {
   disabled?: boolean;
   onClick: () => void;
@@ -14,8 +16,8 @@ export const ContinueButton = ({
       disabled={disabled}
       onClick={onClick}
     >
-      Continue
-      <span>→</span>
+      Split & Embed
+      <IoMdGitNetwork size={20} />
     </button>
   );
 };

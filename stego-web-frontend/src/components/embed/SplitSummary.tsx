@@ -15,10 +15,10 @@ export const SplitSummary = ({ splitInfo }: SplitSummaryProps) => {
         </div>
 
         <div>
-          <h2>How your message will be split</h2>
+          <h2>How your message was split</h2>
 
           <p>
-            Your secret file will be divided across the selected media files as
+            Your secret file was divided across the selected media files as
             shown below.
           </p>
         </div>

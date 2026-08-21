@@ -1,11 +1,14 @@
 import { FolderOpen } from "lucide-react";
 
+import "../../styles/ReceiverDashboard.css";
 import { useReceiverWorkflow } from "../../hooks/useReceiverWorkflow";
 import { useSenderSetup } from "../../hooks/useSenderSetup";
 
 import { MethodSelector } from "../../components/sender/MethodSelector";
 import { MediaUploadCard } from "../../components/sender/MediaUploadCard";
 import { SecretFileUpload } from "../../components/sender/SecretFileUpload";
+import { ExtractedMessageCard } from "../../components/reciever/ExtractedMessageCard";
+import { ComparisonResultCard } from "../../components/reciever/ComparisonResultCard";
 
 export const ReceiverDashboard = () => {
   const {
@@ -88,40 +91,56 @@ export const ReceiverDashboard = () => {
         </div>
       </div>
 
-      <div className="sender-bottom-area receiver-bottom-area">
-        <div className="secret-upload-wrapper">
-          <SecretFileUpload
-            file={secretFile}
-            onUpload={uploadSecretFile}
-            title="Upload original text to confirm extracted message"
-            description="Add the original text file so the extracted output can be compared and verified."
-            emptyLabel="Choose the original text file"
+
+      <div className="secret-upload-wrapper">
+        <SecretFileUpload
+          file={secretFile}
+          onUpload={uploadSecretFile}
+          title="Upload original text to confirm extracted message"
+          description="Add the original text file so the extracted output can be compared and verified."
+          emptyLabel="Choose the original text file"
+        />
+      </div>
+
+      {!isExtracted && (
+        <button
+          type="button"
+          className="continue-button"
+          disabled={isExtracting}
+          onClick={extractMessage}
+        >
+          Extract Hidden Message
+          <span>→</span>
+        </button>
+      )}
+
+      {isExtracted &&
+        <div>
+          <ExtractedMessageCard
+            message={"extractedMessage"}
+            totalParts={uploadedFiles.length}
+            onCompare={verifyMessage}
+            disabled={isVerified}
           />
         </div>
 
-        {!isExtracted && (
-          <button
-            type="button"
-            className="continue-button"
-            disabled={isExtracting}
-            onClick={extractMessage}
-          >
-            Extract Hidden Message
-            <span>→</span>
-          </button>
-        )}
+      }
+      {isVerified && <ComparisonResultCard
+        result={{
+          isMatch: true,
+          originalLength: 100,
+          extractedLength: 100,
+          matchingCharacters: 100,
+          errorCharacters: 0,
+          errorRate: 0,
+          accuracy: 100,
+          psnr: 30,
+          snr: 20,
+        }}
+      />
+      }
 
-        {isExtracted && !isVerified && (
-          <button
-            type="button"
-            className="continue-button"
-            onClick={verifyMessage}
-          >
-            Compare the extracted and original text
-            <span>→</span>
-          </button>
-        )}
-      </div>
+
     </div>
   );
 };

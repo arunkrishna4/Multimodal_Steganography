@@ -25,7 +25,7 @@ export const SplitProgress = ({ files }: SplitProgressProps) => {
           <h2>Message distribution</h2>
 
           <p>
-            The secret message will be distributed across your selected media
+            The secret message was distributed across your selected media
             files.
           </p>
         </div>

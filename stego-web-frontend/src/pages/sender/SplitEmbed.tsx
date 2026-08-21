@@ -1,5 +1,6 @@
 import { LockKeyhole } from "lucide-react";
 
+import "../../styles/SplitEmbed.css";
 import { SplitSummary } from "../../components/embed/SplitSummary";
 import { SplitProgress } from "../../components/embed/SplitProgress";
 import { EmbedFileCard } from "../../components/embed/EmbedFileCard";
