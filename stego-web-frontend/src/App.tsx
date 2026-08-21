@@ -49,9 +49,7 @@ export default App;
 // ==========================================
 
 const ConfigureUploadPage = () => {
-  const navigate = useNavigate();
-
-  return <ConfigureUpload onContinue={() => navigate("/sender/split")} />;
+  return <ConfigureUpload />;
 };
 
 // ==========================================

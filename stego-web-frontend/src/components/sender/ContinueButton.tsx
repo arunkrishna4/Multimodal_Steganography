@@ -1,11 +1,13 @@
 interface ContinueButtonProps {
   disabled?: boolean;
   onClick: () => void;
+  children?: React.ReactNode;
 }
 
 export const ContinueButton = ({
   disabled = false,
   onClick,
+  children = "Continue",
 }: ContinueButtonProps) => {
   return (
     <button
@@ -14,7 +16,7 @@ export const ContinueButton = ({
       disabled={disabled}
       onClick={onClick}
     >
-      Continue
+      {children}
       <span>→</span>
     </button>
   );
