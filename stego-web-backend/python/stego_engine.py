@@ -328,9 +328,14 @@ def main():
                     "Missing embed configuration."
                 )
 
-            config = json.loads(
-                sys.argv[2]
-            )
+            config_path = sys.argv[2]
+            with open(
+                config_path,
+                "r",
+                encoding="utf-8"
+            ) as file:
+                config = json.load(file)
+
 
             message = config["message"]
 
@@ -355,9 +360,13 @@ def main():
                     "Missing extract configuration."
                 )
 
-            config = json.loads(
-                sys.argv[2]
-            )
+            config_path = sys.argv[2]
+            with open(
+                config_path,
+                "r",
+                encoding="utf-8"
+            ) as file:
+                config = json.load(file)
 
             media_files = config["mediaFiles"]
 
