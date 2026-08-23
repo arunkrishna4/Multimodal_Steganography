@@ -4,6 +4,7 @@ import multer from "multer";
 import { splitAndEmbedController } from "../controllers/split-and-embed.controller";
 import path from "path";
 import fs from "fs";
+import { extract } from "../controllers/extract.controller";
 
 const router = Router();
 
@@ -59,11 +60,15 @@ router.post(
 
 
 //extracting from the stego files
-router.post("/extract", (req, res) => {
-    res.json({
-        message: "Extract API reached",
-    });
+const uploadExtract = multer({
+    storage,
 });
+router.post("/extract", uploadExtract.fields([
+    {
+        name: "stegoFiles",
+        maxCount: 20,
+    },
+]), extract);
 
 
 //multer configuration for file upload

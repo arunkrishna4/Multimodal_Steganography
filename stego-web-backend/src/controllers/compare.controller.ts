@@ -53,13 +53,22 @@ export const compare = (
 
     // Read original message from file
     const originalMessage =
-        req.file.buffer.toString("utf-8");
+        req.file.buffer
+            .toString("utf-8")
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n")
+            .trim();
 
+    const normalizedExtractedMessage =
+        extractedMessage
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n")
+            .trim();
 
     // Compare
     const request: CompareRequest = {
         originalMessage,
-        extractedMessage,
+        extractedMessage: normalizedExtractedMessage,
     };
 
     const comparison = compareMessages(request);

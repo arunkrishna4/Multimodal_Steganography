@@ -12,6 +12,7 @@ export interface SplitEmbedMediaResult {
     psnr?: number;
     snr?: number;
     sampleRate?: number;
+    downloadUrl: string;
 }
 
 export interface SplitEmbedResult {
@@ -21,11 +22,16 @@ export interface SplitEmbedResult {
     files: SplitEmbedMediaResult[];
 }
 
+export interface SplitEmbedSuccessResponse {
+    success: true;
+    result: SplitEmbedResult;
+}
+
 export interface SplitEmbedErrorResponse {
     success: false;
     error: string;
 }
 
 export type SplitEmbedResponse =
-    | SplitEmbedResult
+    | SplitEmbedSuccessResponse
     | SplitEmbedErrorResponse;

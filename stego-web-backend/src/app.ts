@@ -3,6 +3,7 @@ import cors from "cors";
 
 import healthRoutes from "./routes/health.routes";
 import stegoRoutes from "./routes/stego.routes";
+import downloadRoutes from "./routes/download.routes";
 
 const app = express();
 
@@ -14,8 +15,22 @@ app.use(
 
 app.use(express.json());
 
-// Routes
-app.use("/api/health", healthRoutes);
-app.use("/api", stegoRoutes);
+// Health routes
+app.use(
+  "/api/health",
+  healthRoutes
+);
+
+// Stegonography routes
+app.use(
+  "/api",
+  stegoRoutes
+);
+
+// Download routes
+app.use(
+  "/api/download",
+  downloadRoutes
+);
 
 export default app;

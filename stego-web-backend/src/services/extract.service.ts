@@ -3,52 +3,43 @@ import path from "path";
 import fs from "fs/promises";
 
 import type {
-    SplitEmbedResult,
-} from "../types/split-and-embed.types";
+    ExtractResponseResult,
+} from "../types/extract.types";
 
-
-// ============================================================
-// TYPES USED BY PYTHON ENGINE
-// ============================================================
 
 interface PythonMediaFile {
     type: "image" | "audio";
     input_path: string;
-    output_path: string;
 }
 
 
-interface PythonEmbedConfig {
-    message: string;
+interface PythonExtractConfig {
     mediaFiles: PythonMediaFile[];
-    outputDir: string;
 }
 
 
-interface PythonEmbedResult {
-    success: boolean;
-
-    totalParts?: number;
-
-    secretMessageLength?: number;
-
-    files?: {
+interface PythonExtractSuccess {
+    success: true;
+    totalParts: number;
+    message: string;
+    parts: {
         sequence: number;
-        mediaType: "image" | "audio";
-        inputFile: string;
-        outputFile: string;
-        messageLength: number;
+        mediaType: string;
+        file: string;
         messageBits: number;
-        headerBits: number;
-        totalBits: number;
-
-        psnr?: number;
-        snr?: number;
-        sampleRate?: number;
     }[];
-
-    error?: string;
 }
+
+
+interface PythonExtractError {
+    success: false;
+    error: string;
+}
+
+
+type PythonExtractResult =
+    | PythonExtractSuccess
+    | PythonExtractError;
 
 
 // ============================================================
@@ -56,19 +47,18 @@ interface PythonEmbedResult {
 // ============================================================
 
 const runPythonEngine = (
-    operation: "embed" | "extract",
-    config: PythonEmbedConfig,
-): Promise<PythonEmbedResult> => {
+    config: PythonExtractConfig,
+): Promise<PythonExtractResult> => {
 
     return new Promise(async (resolve, reject) => {
 
         try {
 
             // --------------------------------------------------
-            // Locate Python engine
+            // 1. Locate Python engine
             // --------------------------------------------------
 
-            const pythonScript = path.resolve(
+            const pythonEnginePath = path.resolve(
                 process.cwd(),
                 "python",
                 "stego_engine.py",
@@ -76,16 +66,17 @@ const runPythonEngine = (
 
 
             // --------------------------------------------------
-            // Create temporary directory
+            // 2. Create output directory
             // --------------------------------------------------
 
-            const tempDir = path.resolve(
+            const outputDir = path.resolve(
                 process.cwd(),
-                "temp",
+                "uploads",
+                "output",
             );
 
             await fs.mkdir(
-                tempDir,
+                outputDir,
                 {
                     recursive: true,
                 },
@@ -93,12 +84,12 @@ const runPythonEngine = (
 
 
             // --------------------------------------------------
-            // Create temporary config file
+            // 3. Create configuration file
             // --------------------------------------------------
 
-            const configPath = path.join(
-                tempDir,
-                `stego-config-${Date.now()}.json`,
+            const configPath = path.resolve(
+                outputDir,
+                "extract_config.json",
             );
 
             await fs.writeFile(
@@ -109,14 +100,14 @@ const runPythonEngine = (
 
 
             // --------------------------------------------------
-            // Start Python process
+            // 4. Spawn Python process
             // --------------------------------------------------
 
             const pythonProcess = spawn(
                 "python",
                 [
-                    pythonScript,
-                    operation,
+                    pythonEnginePath,
+                    "extract",
                     configPath,
                 ],
                 {
@@ -125,13 +116,11 @@ const runPythonEngine = (
             );
 
 
+            // --------------------------------------------------
+            // 5. Collect stdout
+            // --------------------------------------------------
+
             let stdout = "";
-            let stderr = "";
-
-
-            // --------------------------------------------------
-            // Collect stdout
-            // --------------------------------------------------
 
             pythonProcess.stdout.on(
                 "data",
@@ -142,8 +131,10 @@ const runPythonEngine = (
 
 
             // --------------------------------------------------
-            // Collect stderr
+            // 6. Collect stderr
             // --------------------------------------------------
+
+            let stderr = "";
 
             pythonProcess.stderr.on(
                 "data",
@@ -154,17 +145,12 @@ const runPythonEngine = (
 
 
             // --------------------------------------------------
-            // Python process error
+            // 7. Handle process error
             // --------------------------------------------------
 
             pythonProcess.on(
                 "error",
-                async (error) => {
-
-                    await fs.unlink(
-                        configPath,
-                    ).catch(() => { });
-
+                (error) => {
                     reject(
                         new Error(
                             `Failed to start Python engine: ${error.message}`,
@@ -175,27 +161,20 @@ const runPythonEngine = (
 
 
             // --------------------------------------------------
-            // Python process finished
+            // 8. Handle Python process completion
             // --------------------------------------------------
 
             pythonProcess.on(
                 "close",
-                async (code) => {
+                (code) => {
 
-                    // Delete temporary config
-                    await fs.unlink(
-                        configPath,
-                    ).catch(() => { });
-
-
-                    // Python failed
                     if (code !== 0) {
 
                         reject(
                             new Error(
                                 stderr ||
                                 stdout ||
-                                `Python engine exited with code ${code}`,
+                                `Python process exited with code ${code}.`,
                             ),
                         );
 
@@ -203,11 +182,14 @@ const runPythonEngine = (
                     }
 
 
-                    // Parse Python response
+                    // ------------------------------------------
+                    // Parse Python JSON response
+                    // ------------------------------------------
+
                     try {
 
                         const result =
-                            JSON.parse(stdout);
+                            JSON.parse(stdout) as PythonExtractResult;
 
                         resolve(result);
 
@@ -231,108 +213,70 @@ const runPythonEngine = (
 
 
 // ============================================================
-// SPLIT AND EMBED
+// EXTRACT MESSAGE
 // ============================================================
 
-export const splitAndEmbed = async (
-    message: string,
+export const extractMessage = async (
     mediaFiles: PythonMediaFile[],
-    outputDir: string,
-): Promise<SplitEmbedResult> => {
+): Promise<ExtractResponseResult> => {
 
     // --------------------------------------------------------
-    // Validate message
+    // 1. Validate media files
     // --------------------------------------------------------
 
-    if (!message.trim()) {
+    if (
+        !mediaFiles ||
+        mediaFiles.length === 0
+    ) {
         throw new Error(
-            "Secret message cannot be empty.",
+            "No media files provided.",
         );
     }
 
 
     // --------------------------------------------------------
-    // Validate media files
+    // 2. Create Python configuration
     // --------------------------------------------------------
 
-    if (!mediaFiles.length) {
-        throw new Error(
-            "At least one media file is required.",
-        );
-    }
-
-
-    // --------------------------------------------------------
-    // Create Python configuration
-    // --------------------------------------------------------
-
-    const config: PythonEmbedConfig = {
-        message,
+    const config: PythonExtractConfig = {
         mediaFiles,
-        outputDir,
     };
 
 
     // --------------------------------------------------------
-    // Run Python engine
+    // 3. Run Python engine
     // --------------------------------------------------------
 
-    const result = await runPythonEngine(
-        "embed",
-        config,
-    );
+    const pythonResult =
+        await runPythonEngine(config);
 
 
     // --------------------------------------------------------
-    // Check Python result
+    // 4. Check Python result
     // --------------------------------------------------------
 
-    if (!result.success) {
+    if (!pythonResult.success) {
 
         throw new Error(
-            result.error ||
-            "Python engine failed to embed message.",
+            pythonResult.error ||
+            "Python engine failed to extract message.",
         );
     }
 
 
     // --------------------------------------------------------
-    // Make sure required fields exist
+    // 5. Transform Python result
+    //    into frontend response
     // --------------------------------------------------------
 
-    if (
-        result.totalParts === undefined ||
-        result.secretMessageLength === undefined ||
-        !result.files
-    ) {
-        throw new Error(
-            "Python engine returned an incomplete response.",
-        );
-    }
-
-
-    // --------------------------------------------------------
-    // Transform Python result
-    // --------------------------------------------------------
+    const extractedMessage = pythonResult.message
+        .replace(/\r\n/g, "\n")
+        .replace(/\r/g, "\n")
+        .trim();
 
     return {
-        success: true,
-
-        totalParts:
-            result.totalParts,
-
-        secretMessageLength:
-            result.secretMessageLength,
-
-        files: result.files.map(
-            (file) => ({
-                ...file,
-
-                downloadUrl:
-                    `/api/download/${encodeURIComponent(
-                        file.outputFile,
-                    )}`,
-            }),
-        ),
+        mediaFiles: pythonResult.totalParts,
+        messageLength: extractedMessage.length,
+        extractedMessage,
     };
 };
