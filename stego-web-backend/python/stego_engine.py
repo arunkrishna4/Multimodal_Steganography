@@ -383,7 +383,7 @@ def main():
         print(
             json.dumps(
                 result,
-                ensure_ascii=False
+                ensure_ascii=True
             )
         )
 

@@ -1,7 +1,8 @@
 import type { SelectedMethod } from "./steganography";
 
 export interface SenderState {
-  selectedMethods: SelectedMethod[];
-  uploadedFiles: File[];
-  secretFile: File | null;
+    selectedMethods: SelectedMethod[];
+    uploadedFiles: File[];
+    secretFile: File | null;
 }
+

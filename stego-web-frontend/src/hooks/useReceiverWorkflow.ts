@@ -7,108 +7,208 @@ import type {
   VerificationResult,
 } from "../types/steganography";
 
+import type {
+  ExtractResult,
+} from "../types/receiver";
+
+import { extractMessage as extractMessageApi } from "../api/extract.api";
+import { compareMessages as compareMessagesApi } from "../api/compare.api";
+import type { CompareResult } from "../types/api/compare";
+import { toast } from "sonner";
+
 export const useReceiverWorkflow = () => {
+
   const [isExtracting, setIsExtracting] = useState(false);
+
   const [isExtracted, setIsExtracted] = useState(false);
+
   const [isVerified, setIsVerified] = useState(false);
 
+  const [extractResult, setExtractResult] =
+    useState<ExtractResult | null>(null);
+
+  const [compareResult, setCompareResult] =
+    useState<CompareResult | null>(null);
+
+  const [isComparing, setIsComparing] =
+    useState(false);
+
+
+  // --------------------------------------------------
+  // Existing placeholder data
+  // --------------------------------------------------
+
   const receivedFiles: ReceivedMediaFile[] = useMemo(
-    () => [
-      {
-        id: "image-1",
-        mediaType: "image",
-        fileName: "stego_image.png",
-        fileSize: 2.4 * 1024 * 1024,
-      },
-      {
-        id: "video-1",
-        mediaType: "video",
-        fileName: "stego_video.mp4",
-        fileSize: 18.7 * 1024 * 1024,
-      },
-      {
-        id: "audio-1",
-        mediaType: "audio",
-        fileName: "stego_audio.wav",
-        fileSize: 5.1 * 1024 * 1024,
-      },
-      {
-        id: "text-1",
-        mediaType: "text",
-        fileName: "stego_text.txt",
-        fileSize: 48 * 1024,
-      },
-    ],
+    () => [],
     [],
   );
 
+
   const extractionItems: ExtractionItem[] = useMemo(
-    () => [
-      {
-        id: "image-extraction",
-        mediaType: "image",
-        methodName: "LSB Substitution",
-        status: isExtracted ? "done" : "pending",
-      },
-      {
-        id: "video-extraction",
-        mediaType: "video",
-        methodName: "Frame LSB",
-        status: isExtracted ? "done" : "pending",
-      },
-      {
-        id: "audio-extraction",
-        mediaType: "audio",
-        methodName: "Echo Hiding",
-        status: isExtracted ? "done" : "pending",
-      },
-      {
-        id: "text-extraction",
-        mediaType: "text",
-        methodName: "Zero-width Chars",
-        status: isExtracted ? "done" : "pending",
-      },
-    ],
-    [isExtracted],
+    () => [],
+    [],
   );
 
+
   const transmissionDetails: TransmissionDetails = {
-    sentOn: "Aug 11, 2026 · 14:22 UTC",
-    senderHash: "SHA-256: 3f8a...d291",
-    protocol: "MStegh-v2 / AES-256",
-    channel: "Secure / Encrypted",
+    sentOn: "",
+    senderHash: "",
+    protocol: "",
+    channel: "",
   };
 
+
   const verificationResult: VerificationResult = {
-    errorRate: 0.7995,
-    integrity: 99.2005,
-    charsMatched: 2031,
-    totalChars: 2048,
+    errorRate: 0,
+    integrity: 100,
+    charsMatched: 0,
+    totalChars: 0,
   };
+
 
   const totalSize = receivedFiles.reduce(
     (total, file) => total + file.fileSize,
     0,
   );
 
-  const extractMessage = async () => {
+
+  // --------------------------------------------------
+  // Extract message
+  // --------------------------------------------------
+
+  const extractMessage = async (
+    mediaFiles: File[],
+  ) => {
+
     if (isExtracting || isExtracted) {
+      toast.error("Already extracting or extracted!");
       return;
     }
 
-    setIsExtracting(true);
 
-    // Temporary simulation.
-    // Later this will call your Express backend.
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    if (!mediaFiles || mediaFiles.length === 0) {
 
-    setIsExtracting(false);
-    setIsExtracted(true);
+      toast.error("No media files provided for extraction.");
+
+      return;
+    }
+
+
+    try {
+
+      setIsExtracting(true);
+
+      setIsExtracted(false);
+
+      setIsVerified(false);
+
+      setExtractResult(null);
+
+
+      const response = await extractMessageApi(mediaFiles) as any;
+
+      // --------------------------------------------------
+      // Handle backend error response
+      // --------------------------------------------------
+
+      if (response.success === false) {
+        toast.error("Failed to extract message!");
+        return;
+      }
+
+      // --------------------------------------------------
+      // Store actual extraction result (handle wrapped or unwrapped)
+      // --------------------------------------------------
+
+      const result = response.result !== undefined ? response.result : response;
+
+      setExtractResult(result);
+
+      setIsExtracted(true);
+
+      toast.success("Message extracted successfully!");
+
+    } catch (error) {
+
+      toast.error("Failed to extract message!");
+
+      setIsExtracted(false);
+
+    } finally {
+
+      setIsExtracting(false);
+
+    }
   };
 
-  const verifyMessage = () => {
-    setIsVerified(true);
+
+  // --------------------------------------------------
+  // Verification
+  // --------------------------------------------------
+
+  const verifyMessage = async (
+    originalFile: File | null,
+  ) => {
+
+    if (
+      isComparing ||
+      !originalFile ||
+      !extractResult
+    ) {
+      return;
+    }
+
+
+    try {
+
+      setIsComparing(true);
+
+      setIsVerified(false);
+
+      setCompareResult(null);
+
+
+      const response =
+        await compareMessagesApi(
+          originalFile,
+          extractResult.extractedMessage,
+        );
+
+      toast.success("Message compared successfully!");
+
+
+      if (response.success === false) {
+
+        toast.error("Failed to compare messages!");
+
+        return;
+      }
+
+
+      setCompareResult(
+        response.result,
+      );
+
+      setIsVerified(true);
+
+
+    } catch (error) {
+
+      toast.error("Failed to compare messages!");
+
+      setIsVerified(false);
+
+    } finally {
+
+      setIsComparing(false);
+    }
   };
+
+
+
+  // --------------------------------------------------
+  // Return workflow state
+  // --------------------------------------------------
 
   return {
     receivedFiles,
@@ -121,6 +221,11 @@ export const useReceiverWorkflow = () => {
     isExtracting,
     isExtracted,
     isVerified,
+
+    extractResult,
+
+    compareResult,
+    isComparing,
 
     extractMessage,
     verifyMessage,

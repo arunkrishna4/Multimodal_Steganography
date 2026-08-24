@@ -156,10 +156,30 @@ button {
 
 .main-content {
   margin-left: 23%;
-  margin-right:140px;
+  margin-right: 140px;
   width: calc(100% - 180px);
   min-height: 100vh;
   padding: 42px 48px;
+}
+
+.sender-header {
+  margin: auto;
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+  background-color: #e9cdb8;
+}
+
+.sender-description {
+  margin: auto;
+  width: calc(100% - 180px);
+  padding: 10px 10px;
+  font-size: 15px;
+  font-weight: 400;
+  text-align: center;
 }
 
 .page-header {
@@ -228,4 +248,26 @@ button {
   margin-top: 25px;
 }
 
+.status-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 17px;
+  background: #dcfce7;
+  color: #116e33;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
 
+.status-download:hover {
+  background: #bbf7d0;
+  transform: translateY(-1px);
+}
+
+.status-download:active {
+  transform: translateY(0);
+}

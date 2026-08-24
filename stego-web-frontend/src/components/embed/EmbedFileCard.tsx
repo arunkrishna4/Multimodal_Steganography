@@ -3,7 +3,7 @@ import {
   Video,
   Music,
   FileText,
-  Check,
+  Download,
   LoaderCircle,
   type LucideIcon,
 } from "lucide-react";
@@ -12,6 +12,10 @@ import type { EmbedFile, MediaType } from "../../types/embed";
 
 interface EmbedFileCardProps {
   file: EmbedFile;
+  psnr?: number;
+  snr?: number;
+  downloadUrl?: string;
+  onDownload: (downloadUrl: string) => void;
 }
 
 const ICONS: Record<MediaType, LucideIcon> = {
@@ -21,17 +25,23 @@ const ICONS: Record<MediaType, LucideIcon> = {
   text: FileText,
 };
 
-export const EmbedFileCard = ({ file }: EmbedFileCardProps) => {
+export const EmbedFileCard = ({
+  file,
+  psnr,
+  snr,
+  downloadUrl,
+  onDownload,
+}: EmbedFileCardProps) => {
   const Icon = ICONS[file.mediaType];
 
   const isDone = file.status === "done";
   const isProcessing = file.status === "processing";
 
   const qualityMetric =
-    file.mediaType === "image"
-      ? { label: "PSNR", value: "20.5 dB" }
-      : file.mediaType === "audio"
-        ? { label: "SNR", value: "20.5 dB" }
+    file.mediaType === "image" && psnr !== undefined
+      ? { label: "PSNR", value: `${psnr.toFixed(2)} dB` }
+      : file.mediaType === "audio" && snr !== undefined
+        ? { label: "SNR", value: `${snr.toFixed(2)} dB` }
         : null;
 
   return (
@@ -52,8 +62,13 @@ export const EmbedFileCard = ({ file }: EmbedFileCardProps) => {
 
             {qualityMetric && (
               <div className="detailsbox">
-                <span className="meta-label">{qualityMetric.label}</span>
-                <span className="meta-value">{qualityMetric.value}</span>
+                <span className="meta-label">
+                  {qualityMetric.label}
+                </span>
+
+                <span className="meta-value">
+                  {(qualityMetric.value)}
+                </span>
               </div>
             )}
           </div>
@@ -61,21 +76,31 @@ export const EmbedFileCard = ({ file }: EmbedFileCardProps) => {
       </div>
 
       <div className="embed-status">
-        {isDone && (
-          <span className="status-done">
-            Embedding Done <Check size={15} />
-          </span>
+        {isDone && downloadUrl && (
+          <button
+            type="button"
+            className="status-download"
+            onClick={() => onDownload(downloadUrl)}
+          >
+            <Download size={16} />
+            Download
+          </button>
         )}
 
         {isProcessing && (
           <span className="status-processing">
-            <LoaderCircle size={16} className="spin" />
+            <LoaderCircle
+              size={16}
+              className="spin"
+            />
             Embedding...
           </span>
         )}
 
         {!isDone && !isProcessing && (
-          <span className="status-pending">Ready</span>
+          <span className="status-pending">
+            Ready
+          </span>
         )}
       </div>
     </div>

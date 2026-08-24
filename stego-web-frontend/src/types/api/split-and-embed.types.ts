@@ -1,6 +1,6 @@
 export type MediaType = "image" | "audio";
 
-export interface SplitEmbedMediaResult {
+export interface SplitEmbedFileResult {
     sequence: number;
     mediaType: MediaType;
     inputFile: string;
@@ -19,7 +19,7 @@ export interface SplitEmbedSuccessResponse {
     success: true;
     totalParts: number;
     secretMessageLength: number;
-    files: SplitEmbedMediaResult[];
+    files: SplitEmbedFileResult[];
 }
 
 export interface SplitEmbedErrorResponse {

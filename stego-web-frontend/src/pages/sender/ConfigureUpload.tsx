@@ -1,4 +1,4 @@
-import { FolderOpen } from "lucide-react";
+import { FolderOpen, ClipboardList } from "lucide-react";
 
 import { MethodSelector } from "../../components/sender/MethodSelector";
 import { MediaUploadCard } from "../../components/sender/MediaUploadCard";
@@ -28,9 +28,17 @@ export const ConfigureUpload = () => {
 
     embeded,
     isEmbeded,
+    loading,
+    response,
 
     isReadyToContinue,
+    handleDownload,
+
+    handleSplitAndEmbed,
   } = useSenderSetup();
+
+  //to be removed, just for testing.
+
 
   // Build one EmbedFile entry per uploaded carrier file
   const embedFiles: EmbedFile[] = selectedMethods.flatMap((item) => {
@@ -63,6 +71,12 @@ export const ConfigureUpload = () => {
       {/* =========================
           TOP WORKFLOW
           ========================= */}
+      <div className="sender-header">
+        Sender
+        <div className="sender-description">
+          Hide your secret message inside media files using steganography.
+        </div>
+      </div>
 
       <div className="sender-grid">
         {/* LEFT COLUMN */}
@@ -134,10 +148,9 @@ export const ConfigureUpload = () => {
 
       <div className="continue-wrapper">
         <ContinueButton
-          disabled={!isReadyToContinue}
-          onClick={() => {
-            isEmbeded(true);
-          }}
+          disabled={!isReadyToContinue || embeded === true}
+          loading={loading}
+          onClick={handleSplitAndEmbed}
         />
       </div>
 
@@ -146,19 +159,44 @@ export const ConfigureUpload = () => {
         <div className="Results">
           <div style={{ marginTop: 20 }}>
             {/* // splitprogress is still visible after the condition */}
-            {embedFiles.length !== 1 && (
+            {response?.success && response.files.length !== 1 && (
               <>
                 <SplitSummary splitInfo={splitInfo} />
+
                 <div style={{ marginTop: 20 }}>
-                  <SplitProgress files={embedFiles} />
+                  <SplitProgress files={response.files} />
                 </div>
               </>
             )}
           </div>
 
           <div className="OuterEmbedFileCard">
-            {embedFiles.map((file) => (
-              <EmbedFileCard key={file.id} file={file} />
+            <div className="section-heading">
+              <div className="section-icon">
+                <ClipboardList size={20} />
+              </div>
+
+              <div>
+                <h2>Results</h2>
+
+                <p>Here are the results of the split and embed operation. Please download your Stego-files.</p>
+              </div>
+            </div>
+            {embedFiles.map((file, index) => (
+              <EmbedFileCard
+                key={file.id}
+                file={file}
+                onDownload={handleDownload}
+                psnr={
+                  response?.success ? response.files[index]?.psnr : undefined
+                }
+                snr={
+                  response?.success ? response.files[index]?.snr : undefined
+                }
+                downloadUrl={
+                  response?.success ? response.files[index]?.downloadUrl : undefined
+                }
+              />
             ))}
           </div>
           <EmbedSuccess fileCount={embedFiles.length} />

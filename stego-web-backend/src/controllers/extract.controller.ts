@@ -85,10 +85,16 @@ export const extract = async (
 
     } catch (error) {
 
+        console.error("========== EXTRACT ERROR ==========");
+        console.error(error);
+        console.error("===================================");
+
         return res.status(500).json({
             success: false,
-            error: "Extraction failed.",
+            error:
+                error instanceof Error
+                    ? error.message
+                    : "Extraction failed.",
         });
-
     }
 };

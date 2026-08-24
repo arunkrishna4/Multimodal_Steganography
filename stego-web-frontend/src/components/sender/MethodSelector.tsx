@@ -7,13 +7,18 @@ import { MethodCard } from "./MethodCard";
 
 interface MethodSelectorProps {
   selectedMethods: SelectedMethod[];
+  heading?: string;
+  description?: string;
   onToggle: (mediaType: MediaType) => void;
   onMethodChange: (mediaType: MediaType, methodId: string) => void;
   onNumberOfFilesChange: (mediaType: MediaType, count: number) => void;
+
 }
 
 export const MethodSelector = ({
   selectedMethods,
+  heading,
+  description,
   onToggle,
   onMethodChange,
   onNumberOfFilesChange,
@@ -26,11 +31,10 @@ export const MethodSelector = ({
         </div>
 
         <div>
-          <h2>Choose your hiding methods</h2>
+          <h2>{heading || "Choose your hiding methods"}</h2>
 
           <p>
-            Select which types of files you want to use to hide your secret
-            message.
+            {description || "Select which types of files you want to use to hide your secret message."}
           </p>
         </div>
       </div>

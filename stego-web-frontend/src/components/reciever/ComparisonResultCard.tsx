@@ -144,37 +144,6 @@ export const ComparisonResultCard = ({
 
             </div>
 
-
-            {/* Media Quality */}
-            <div className="comparison-section">
-
-                <div className="comparison-section-heading">
-                    <BarChart3 size={18} />
-
-                    <h3>Media Quality</h3>
-                </div>
-
-
-                <div className="comparison-stats-grid">
-
-                    {result.psnr !== undefined && (
-                        <Stat
-                            label="Image PSNR"
-                            value={`${result.psnr.toFixed(2)} dB`}
-                        />
-                    )}
-
-                    {result.snr !== undefined && (
-                        <Stat
-                            label="Audio SNR"
-                            value={`${result.snr.toFixed(2)} dB`}
-                        />
-                    )}
-
-                </div>
-
-            </div>
-
         </section>
     );
 };

@@ -194,10 +194,7 @@ export const splitAndEmbedController = async (
         // Return result
         // --------------------------------------------------
 
-        return res.status(200).json({
-            success: true,
-            result,
-        });
+        return res.status(200).json(result);
 
     } catch (error) {
 

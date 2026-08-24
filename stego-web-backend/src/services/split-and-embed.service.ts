@@ -3,7 +3,8 @@ import path from "path";
 import fs from "fs/promises";
 
 import type {
-    SplitEmbedResult,
+    SplitEmbedResponse,
+
 } from "../types/split-and-embed.types";
 
 
@@ -238,7 +239,7 @@ export const splitAndEmbed = async (
     message: string,
     mediaFiles: PythonMediaFile[],
     outputDir: string,
-): Promise<SplitEmbedResult> => {
+): Promise<SplitEmbedResponse> => {
 
     // --------------------------------------------------------
     // Validate message

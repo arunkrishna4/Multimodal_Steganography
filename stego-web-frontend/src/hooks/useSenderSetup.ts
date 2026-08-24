@@ -1,6 +1,10 @@
 import { useMemo, useState } from "react";
 
 import type { SelectedMethod, MediaType } from "../types/steganography";
+import { splitAndEmbed } from "../api/splitAndEmbed.api";
+import type { SplitEmbedResponse, } from "../types/api/split-and-embed.types";
+import { downloadFile } from "../api/download.api";
+import { toast } from "sonner";
 
 export const useSenderSetup = () => {
   const [selectedMethods, setSelectedMethods] = useState<SelectedMethod[]>([]);
@@ -10,6 +14,10 @@ export const useSenderSetup = () => {
   const [secretFile, setSecretFile] = useState<File | null>(null);
 
   const [embeded, isEmbeded] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+
+  const [response, setResponse] = useState<SplitEmbedResponse | null>(null);
 
   const toggleMediaType = (mediaType: MediaType) => {
     setSelectedMethods((current) => {
@@ -76,18 +84,22 @@ export const useSenderSetup = () => {
 
       return [...otherFiles, ...nextFiles];
     });
+    toast.success("File uploaded successfully!");
 
     // Uploading a new file invalidates any previous embed result
     if (embeded) {
       isEmbeded(false);
+      toast.error("Failed to embed file!");
     }
   };
 
   const uploadSecretFile = (file: File) => {
     setSecretFile(file);
+    toast.success("File uploaded successfully!");
 
     if (embeded) {
       isEmbeded(false);
+      toast.error("Failed to embed file!");
     }
   };
 
@@ -119,6 +131,49 @@ export const useSenderSetup = () => {
     return secretFile !== null;
   }, [selectedMethods, uploadedFiles, secretFile]);
 
+  //api call for the split and embed button
+  const handleSplitAndEmbed = async () => {
+    if (!secretFile) return;
+
+    try {
+      setLoading(true);
+
+      const result =
+        await splitAndEmbed(
+          secretFile,
+          uploadedFiles,
+        );
+
+      setResponse(result);
+
+      if (result.success) {
+        isEmbeded(true);
+        toast.success("File embedded successfully!");
+      }
+
+    } catch (error) {
+      isEmbeded(false);
+      toast.error("Failed to embed file!");
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownload = async (downloadUrl: string) => {
+    if (!downloadUrl) {
+      toast.error("Download URL is missing.");
+      return;
+    }
+
+    try {
+      await downloadFile(downloadUrl);
+      toast.success("File downloaded successfully!");
+    } catch (error) {
+      toast.error("Failed to download stego file!");
+    }
+  };
+
   return {
     selectedMethods,
     uploadedFiles,
@@ -132,8 +187,13 @@ export const useSenderSetup = () => {
 
     embeded,
     isEmbeded,
+    response,
 
     isReadyToContinue,
+    loading,
+
+    handleSplitAndEmbed,
+    handleDownload,
   };
 };
 

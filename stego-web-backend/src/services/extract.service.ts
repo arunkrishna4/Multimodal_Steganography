@@ -168,6 +168,12 @@ const runPythonEngine = (
                 "close",
                 (code) => {
 
+                    console.log("========== PYTHON EXTRACT ==========");
+                    console.log("Exit code:", code);
+                    console.log("STDOUT:", stdout);
+                    console.log("STDERR:", stderr);
+                    console.log("====================================");
+
                     if (code !== 0) {
 
                         reject(

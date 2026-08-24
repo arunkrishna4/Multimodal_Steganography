@@ -1,7 +1,12 @@
+
 def text_to_binary(text):
     """Convert UTF-8 text into a binary string."""
     byte_message = text.encode("utf-8")
-    return "".join(format(byte, "08b") for byte in byte_message)
+
+    return "".join(
+        format(byte, "08b")
+        for byte in byte_message
+    )
 
 
 def binary_to_text(binary_string):
@@ -12,9 +17,13 @@ def binary_to_text(binary_string):
         byte_chunk = binary_string[i:i + 8]
 
         if len(byte_chunk) == 8:
-            byte_list.append(int(byte_chunk, 2))
+            byte_list.append(
+                int(byte_chunk, 2)
+            )
 
-    return bytes(byte_list).decode("utf-8", errors="replace")
+    byte_data = bytes(byte_list)
+
+    return byte_data.decode("utf-8")
 
 
 def int_to_fixed_binary(integer, num_bits):
@@ -24,9 +33,16 @@ def int_to_fixed_binary(integer, num_bits):
             f"Integer {integer} out of range for {num_bits} bits."
         )
 
-    return format(integer, f"0{num_bits}b")
+    return format(
+        integer,
+        f"0{num_bits}b"
+    )
 
 
 def fixed_binary_to_int(binary_string):
-    """Convert a binary string into an integer."""
-    return int(binary_string, 2)
+    """Convert an integer from fixed-length binary."""
+    return int(
+        binary_string,
+        2
+    )
+

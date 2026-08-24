@@ -15,8 +15,13 @@ export const ReceiverDashboard = () => {
     isExtracting,
     isExtracted,
     isVerified,
+    isComparing,
+
     extractMessage,
     verifyMessage,
+
+    extractResult,
+    compareResult,
   } = useReceiverWorkflow();
 
   const {
@@ -32,6 +37,13 @@ export const ReceiverDashboard = () => {
 
   return (
     <div className="sender-page receiver-page">
+      <div className="sender-header">
+        Receiver
+        <div className="sender-description">
+          Extract hidden message from media files using steganography.
+        </div>
+      </div>
+
       <div className="sender-grid">
         <div className="sender-column">
           <MethodSelector
@@ -39,6 +51,8 @@ export const ReceiverDashboard = () => {
             onToggle={toggleMediaType}
             onMethodChange={changeMethod}
             onNumberOfFilesChange={changeNumberOfFiles}
+            heading="Select the methods used to hide the message"
+            description="Choose the types of files that were used to hide the message."
           />
         </div>
 
@@ -106,39 +120,43 @@ export const ReceiverDashboard = () => {
         <button
           type="button"
           className="continue-button"
-          disabled={isExtracting}
-          onClick={extractMessage}
+          disabled={isExtracting || isExtracted || uploadedFiles.length === 0}
+          onClick={() => extractMessage(uploadedFiles)}
         >
-          Extract Hidden Message
-          <span>→</span>
+          {isExtracting
+            ? "Extracting..."
+            : "Extract Hidden Message"}
+
+          {!isExtracting && <span>→</span>}
         </button>
       )}
 
-      {isExtracted &&
-        <div>
-          <ExtractedMessageCard
-            message={"extractedMessage"}
-            totalParts={uploadedFiles.length}
-            onCompare={verifyMessage}
-            disabled={isVerified}
-          />
-        </div>
+      {isExtracted && extractResult && (
+        <ExtractedMessageCard
+          message={extractResult.extractedMessage}
+          totalParts={extractResult.mediaFiles}
+          onCompare={() => verifyMessage(secretFile)}
+          disabled={
+            isVerified ||
+            isComparing ||
+            !secretFile
+          }
+        />
+      )}
 
-      }
-      {isVerified && <ComparisonResultCard
-        result={{
-          isMatch: true,
-          originalLength: 100,
-          extractedLength: 100,
-          matchingCharacters: 100,
-          errorCharacters: 0,
-          errorRate: 0,
-          accuracy: 100,
-          psnr: 30,
-          snr: 20,
-        }}
-      />
-      }
+      {isVerified && compareResult && (
+        <ComparisonResultCard
+          result={{
+            isMatch: compareResult.exactMatch,
+            originalLength: compareResult.originalLength,
+            extractedLength: compareResult.extractedLength,
+            matchingCharacters: compareResult.matchingCharacters,
+            errorCharacters: compareResult.errorCharacters,
+            errorRate: compareResult.errorRate,
+            accuracy: compareResult.accuracy,
+          }}
+        />
+      )}
 
 
     </div>

@@ -4,14 +4,22 @@ import { Sidebar } from "./components/layout/Sidebar";
 
 import { ConfigureUpload } from "./pages/sender/ConfigureUpload";
 import { ReceiverDashboard } from "./pages/reciever/ReceiverDashboard";
+import { Toaster } from "sonner";
 
 function App() {
+
   return (
     <BrowserRouter>
       <div className="app">
         <Sidebar />
 
         <main className="main-content">
+          <Toaster
+            position="top-right"
+
+            richColors
+            closeButton
+          />
           <Routes>
             <Route
               path="/"
