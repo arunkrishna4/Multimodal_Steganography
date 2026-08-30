@@ -35,3 +35,10 @@ dist-ssr
 *.sw?
 
 stego-web-backend/python/__pycache__/common.cpython-311.pyc
+
+
+
+# Python test artifacts
+stego-web-backend/python/test_output/
+stego-web-backend/python/test_audio.wav
+stego-web-backend/python/test_image.png
