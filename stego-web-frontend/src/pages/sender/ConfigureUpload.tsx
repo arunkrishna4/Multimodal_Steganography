@@ -27,7 +27,7 @@ export const ConfigureUpload = () => {
     uploadSecretFile,
 
     embeded,
-    isEmbeded,
+    // isEmbeded,
     loading,
     response,
 
