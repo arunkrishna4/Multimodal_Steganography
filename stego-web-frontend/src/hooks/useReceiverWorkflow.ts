@@ -15,6 +15,7 @@ import { extractMessage as extractMessageApi } from "../api/extract.api";
 import { compareMessages as compareMessagesApi } from "../api/compare.api";
 import type { CompareResult } from "../types/api/compare";
 import { toast } from "sonner";
+import type { AxiosError } from "axios";
 
 export const useReceiverWorkflow = () => {
 
@@ -130,9 +131,11 @@ export const useReceiverWorkflow = () => {
 
     } catch (error) {
 
+      const axiosError = error as AxiosError<{ error?: string }>;
+
       const message =
-        error?.response?.data?.error ||
-        error?.message ||
+        axiosError.response?.data?.error ||
+        axiosError.message ||
         "An unexpected error occurred.";
 
       toast.error(message);
@@ -183,11 +186,12 @@ export const useReceiverWorkflow = () => {
       toast.success("Message compared successfully!");
 
     } catch (error) {
-      console.error("Compare error:", error);
+
+      const axiosError = error as AxiosError<{ error?: string }>;
 
       const message =
-        error?.response?.data?.error ||
-        error?.message ||
+        axiosError.response?.data?.error ||
+        axiosError.message ||
         "An unexpected error occurred.";
 
       toast.error(message);

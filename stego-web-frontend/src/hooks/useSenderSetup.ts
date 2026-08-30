@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { AxiosError } from "axios";
 
 import type { SelectedMethod, MediaType } from "../types/steganography";
 import { splitAndEmbed } from "../api/splitAndEmbed.api";
@@ -155,9 +156,11 @@ export const useSenderSetup = () => {
     } catch (error) {
       isEmbeded(false);
 
+      const axiosError = error as AxiosError<{ error?: string }>;
+
       const message =
-        error?.response?.data?.error ||
-        error?.message ||
+        axiosError.response?.data?.error ||
+        axiosError.message ||
         "An unexpected error occurred.";
 
       toast.error(message);
@@ -177,9 +180,11 @@ export const useSenderSetup = () => {
       await downloadFile(downloadUrl);
       toast.success("File downloaded successfully!");
     } catch (error) {
+      const axiosError = error as AxiosError<{ error?: string }>;
+
       const message =
-        error?.response?.data?.error ||
-        error?.message ||
+        axiosError.response?.data?.error ||
+        axiosError.message ||
         "An unexpected error occurred.";
 
       toast.error(message);

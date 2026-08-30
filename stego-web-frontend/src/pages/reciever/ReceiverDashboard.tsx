@@ -6,7 +6,6 @@ import { useSenderSetup } from "../../hooks/useSenderSetup";
 
 import { MethodSelector } from "../../components/sender/MethodSelector";
 import { MediaUploadCard } from "../../components/sender/MediaUploadCard";
-import { SecretFileUpload } from "../../components/sender/SecretFileUpload";
 import { ExtractedMessageCard } from "../../components/reciever/ExtractedMessageCard";
 import { ComparisonResultCard } from "../../components/reciever/ComparisonResultCard";
 import { ClearWorkflowButton } from "../../components/common/ClearWorkflowButton";
