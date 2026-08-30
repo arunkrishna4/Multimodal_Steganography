@@ -130,7 +130,12 @@ export const useReceiverWorkflow = () => {
 
     } catch (error) {
 
-      toast.error("Failed to extract message!");
+      const message =
+        error?.response?.data?.error ||
+        error?.message ||
+        "An unexpected error occurred.";
+
+      toast.error(message);
 
       setIsExtracted(false);
 
@@ -149,7 +154,6 @@ export const useReceiverWorkflow = () => {
   const verifyMessage = async (
     originalFile: File | null,
   ) => {
-
     if (
       isComparing ||
       !originalFile ||
@@ -158,50 +162,53 @@ export const useReceiverWorkflow = () => {
       return;
     }
 
-
     try {
-
       setIsComparing(true);
-
       setIsVerified(false);
-
       setCompareResult(null);
 
-
-      const response =
-        await compareMessagesApi(
-          originalFile,
-          extractResult.extractedMessage,
-        );
-
-      toast.success("Message compared successfully!");
-
+      const response = await compareMessagesApi(
+        originalFile,
+        extractResult.extractedMessage,
+      );
 
       if (response.success === false) {
-
         toast.error("Failed to compare messages!");
-
         return;
       }
 
-
-      setCompareResult(
-        response.result,
-      );
-
+      setCompareResult(response.result);
       setIsVerified(true);
 
+      toast.success("Message compared successfully!");
 
     } catch (error) {
+      console.error("Compare error:", error);
 
-      toast.error("Failed to compare messages!");
+      const message =
+        error?.response?.data?.error ||
+        error?.message ||
+        "An unexpected error occurred.";
+
+      toast.error(message);
 
       setIsVerified(false);
 
     } finally {
-
       setIsComparing(false);
     }
+  };
+
+  const clearWorkflow = () => {
+    setIsExtracting(false);
+    setIsExtracted(false);
+    setIsVerified(false);
+
+    setExtractResult(null);
+    setCompareResult(null);
+    setIsComparing(false);
+
+    toast.success("Workflow cleared successfully!");
   };
 
 
@@ -229,5 +236,7 @@ export const useReceiverWorkflow = () => {
 
     extractMessage,
     verifyMessage,
+
+    clearWorkflow,
   };
 };

@@ -174,7 +174,7 @@
 
     padding: 15px;
 
-    border: 1px solid #dfd3ca;
+    border: 1px solid #050505;
     border-radius: 12px;
 
     background: #fffaf7;
@@ -186,6 +186,10 @@
 
     white-space: pre-wrap;
     word-break: break-word;
+}
+
+.original-message-upload {
+    margin-top: 20px;
 }
 
 

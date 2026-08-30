@@ -5,6 +5,7 @@ import { splitAndEmbed } from "../api/splitAndEmbed.api";
 import type { SplitEmbedResponse, } from "../types/api/split-and-embed.types";
 import { downloadFile } from "../api/download.api";
 import { toast } from "sonner";
+import { getMediaType } from "../utils/senderHelper";
 
 export const useSenderSetup = () => {
   const [selectedMethods, setSelectedMethods] = useState<SelectedMethod[]>([]);
@@ -153,7 +154,13 @@ export const useSenderSetup = () => {
 
     } catch (error) {
       isEmbeded(false);
-      toast.error("Failed to embed file!");
+
+      const message =
+        error?.response?.data?.error ||
+        error?.message ||
+        "An unexpected error occurred.";
+
+      toast.error(message);
 
     } finally {
       setLoading(false);
@@ -170,8 +177,22 @@ export const useSenderSetup = () => {
       await downloadFile(downloadUrl);
       toast.success("File downloaded successfully!");
     } catch (error) {
-      toast.error("Failed to download stego file!");
+      const message =
+        error?.response?.data?.error ||
+        error?.message ||
+        "An unexpected error occurred.";
+
+      toast.error(message);
     }
+  };
+
+  const clearWorkflow = () => {
+    setSelectedMethods([]);
+    setUploadedFiles([]);
+    setSecretFile(null);
+
+    isEmbeded(false);
+    setResponse(null);
   };
 
   return {
@@ -194,21 +215,7 @@ export const useSenderSetup = () => {
 
     handleSplitAndEmbed,
     handleDownload,
+    clearWorkflow,
   };
 };
 
-const getMediaType = (file: File): MediaType => {
-  if (file.type.startsWith("image/")) {
-    return "image";
-  }
-
-  if (file.type.startsWith("video/")) {
-    return "video";
-  }
-
-  if (file.type.startsWith("audio/")) {
-    return "audio";
-  }
-
-  return "text";
-};

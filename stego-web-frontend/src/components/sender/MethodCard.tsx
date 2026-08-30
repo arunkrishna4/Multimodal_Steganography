@@ -9,6 +9,7 @@ interface MethodCardProps {
   onToggle: () => void;
   onMethodChange: (methodId: string) => void;
   onNumberOfFilesChange: (count: number) => void;
+  disabled: boolean;
 }
 
 const ICONS = {
@@ -25,14 +26,18 @@ export const MethodCard = ({
   onToggle,
   onMethodChange,
   onNumberOfFilesChange,
+  disabled,
 }: MethodCardProps) => {
   const Icon = ICONS[option.icon as keyof typeof ICONS];
 
   const handleCardClick = () => {
+    if (disabled) return;
+
     onToggle();
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (disabled) return;
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       onToggle();
@@ -41,7 +46,8 @@ export const MethodCard = ({
 
   return (
     <div
-      className={`method-card ${selected ? "method-card-selected" : ""}`}
+      className={`method-card ${selected ? "method-card-selected" : ""} ${disabled ? "method-card-disabled" : ""
+        }`}
       role="checkbox"
       aria-checked={selected}
       tabIndex={0}
@@ -50,9 +56,8 @@ export const MethodCard = ({
     >
       <div className="method-card-header">
         <div
-          className={`custom-checkbox ${
-            selected ? "custom-checkbox-checked" : ""
-          }`}
+          className={`custom-checkbox ${selected ? "custom-checkbox-checked" : ""
+            }`}
           aria-hidden="true"
         />
 
@@ -80,6 +85,7 @@ export const MethodCard = ({
             <select
               id={`${option.type}-method`}
               value={selectedMethod?.methodId ?? ""}
+              disabled={disabled}
               onChange={(event) => onMethodChange(event.target.value)}
               onClick={(event) => event.stopPropagation()}
             >
@@ -104,6 +110,7 @@ export const MethodCard = ({
               className="method-selector-input"
               min={1}
               value={selectedMethod?.numberOfFiles ?? 1}
+              disabled={disabled}
               onChange={(event) => {
                 const nextValue = Number(event.target.value) || 1;
                 onNumberOfFilesChange(Math.max(1, nextValue));

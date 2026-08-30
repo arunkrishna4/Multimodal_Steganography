@@ -1,19 +1,32 @@
-import { CheckCircle2, Copy, FileText, Files } from "lucide-react";
+import { CheckCircle2, Copy, FileText, Files, LoaderCircle } from "lucide-react";
 import { useState } from "react";
+import { SecretFileUpload } from "../sender/SecretFileUpload";
 import "../../styles/ExtractedMessageCard.css";
 
 interface ExtractedMessageCardProps {
   message: string;
   totalParts: number;
+
+  originalFile: File | null;
+  onOriginalFileUpload: (file: File) => void;
+
   onCompare: () => void;
+
   disabled?: boolean;
+  isComparing?: boolean;
+  hasOriginalFile?: boolean;
+
 }
 
 export const ExtractedMessageCard = ({
   message,
   totalParts,
+  originalFile,
+  onOriginalFileUpload,
   onCompare,
-  disabled,
+  disabled = false,
+  isComparing = false,
+  hasOriginalFile = false,
 }: ExtractedMessageCardProps) => {
   const [copied, setCopied] = useState(false);
 
@@ -29,6 +42,8 @@ export const ExtractedMessageCard = ({
       console.error("Failed to copy message:", error);
     }
   };
+
+  const isCompleted = disabled && hasOriginalFile && !isComparing;
 
   return (
     <section className="extracted-message-card">
@@ -82,6 +97,7 @@ export const ExtractedMessageCard = ({
         <div className="extracted-message-title">
           <div>
             <h3>Extracted secret message</h3>
+
             <p>
               This is the message reconstructed from the stego files.
             </p>
@@ -104,6 +120,20 @@ export const ExtractedMessageCard = ({
 
       </div>
 
+      {/* Original Message */}
+      <div className="original-message-upload">
+
+        <SecretFileUpload
+          file={originalFile}
+          onUpload={onOriginalFileUpload}
+          title="Upload original secret message"
+          description="Add the original text file to verify the accuracy of the extracted message."
+          emptyLabel="Choose the original text file"
+          readyLabel="Ready to compare"
+        />
+
+      </div>
+
       {/* Compare */}
       <div className="compare-message-section">
 
@@ -120,10 +150,30 @@ export const ExtractedMessageCard = ({
           type="button"
           className="compare-message-button"
           onClick={onCompare}
-          disabled={disabled}
-          style={{ opacity: disabled ? 0.5 : 1, cursor: disabled ? "not-allowed" : "pointer" }}
+          disabled={!hasOriginalFile || isComparing || isCompleted}
+          style={{
+            opacity:
+              !hasOriginalFile || isComparing || isCompleted
+                ? 0.5
+                : 1,
+            cursor:
+              !hasOriginalFile || isComparing || isCompleted
+                ? "not-allowed"
+                : "pointer",
+          }}
         >
-          {disabled ? "Compared" : "Compare Text"}
+          {isComparing ? (
+            <>
+              <LoaderCircle size={15} className="spin" />
+              Comparing...
+            </>
+          ) : isCompleted ? (
+            "Compared"
+          ) : !hasOriginalFile ? (
+            "Upload Original Text"
+          ) : (
+            "Compare Text"
+          )}
         </button>
 
       </div>

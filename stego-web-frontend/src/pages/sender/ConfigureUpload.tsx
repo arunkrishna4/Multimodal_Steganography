@@ -11,8 +11,9 @@ import { EmbedFileCard } from "../../components/embed/EmbedFileCard";
 import { SplitSummary } from "../../components/embed/SplitSummary";
 
 import type { EmbedFile } from "../../types/embed";
-import type { MediaType } from "../../types/steganography";
 import { SplitProgress } from "../../components/embed/SplitProgress";
+import { ClearWorkflowButton } from "../../components/common/ClearWorkflowButton";
+import { getMediaType } from "../../utils/senderHelper";
 
 export const ConfigureUpload = () => {
   const {
@@ -27,13 +28,12 @@ export const ConfigureUpload = () => {
     uploadSecretFile,
 
     embeded,
-    // isEmbeded,
     loading,
     response,
 
     isReadyToContinue,
     handleDownload,
-
+    clearWorkflow,
     handleSplitAndEmbed,
   } = useSenderSetup();
 
@@ -50,9 +50,9 @@ export const ConfigureUpload = () => {
       id: `${item.mediaType}-${index}`,
       fileName: file.name,
       bytes: file.size,
-      percentage: 100, // set dynamically once real embed progress is wired up
+      percentage: 100,
       mediaType: item.mediaType,
-      methodName: item.methodId, // swap for a display-name lookup if you have one
+      methodName: item.methodId,
       status: "done" as const,
     }));
   });
@@ -80,9 +80,11 @@ export const ConfigureUpload = () => {
 
       <div className="sender-grid">
         {/* LEFT COLUMN */}
+
         <div className="sender-column">
           <MethodSelector
             selectedMethods={selectedMethods}
+            disabled={embeded}
             onToggle={toggleMediaType}
             onMethodChange={changeMethod}
             onNumberOfFilesChange={changeNumberOfFiles}
@@ -146,6 +148,7 @@ export const ConfigureUpload = () => {
         <SecretFileUpload file={secretFile} onUpload={uploadSecretFile} />
       </div>
 
+
       <div className="continue-wrapper">
         <ContinueButton
           disabled={!isReadyToContinue || embeded === true}
@@ -170,6 +173,7 @@ export const ConfigureUpload = () => {
             )}
           </div>
 
+          <EmbedSuccess fileCount={embedFiles.length} />
           <div className="OuterEmbedFileCard">
             <div className="section-heading">
               <div className="section-icon">
@@ -199,25 +203,19 @@ export const ConfigureUpload = () => {
               />
             ))}
           </div>
-          <EmbedSuccess fileCount={embedFiles.length} />
+
         </div>
       ) : null}
+      <ClearWorkflowButton
+        onClear={clearWorkflow}
+        disabled={
+          selectedMethods.length === 0 &&
+          uploadedFiles.length === 0 &&
+          !secretFile
+        }
+      />
     </div>
   );
 };
 
-const getMediaType = (file: File): MediaType => {
-  if (file.type.startsWith("image/")) {
-    return "image";
-  }
 
-  if (file.type.startsWith("video/")) {
-    return "video";
-  }
-
-  if (file.type.startsWith("audio/")) {
-    return "audio";
-  }
-
-  return "text";
-};

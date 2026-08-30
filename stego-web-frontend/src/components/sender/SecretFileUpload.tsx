@@ -6,6 +6,7 @@ interface SecretFileUploadProps {
   title?: string;
   description?: string;
   emptyLabel?: string;
+  readyLabel?: string;
 }
 
 export const SecretFileUpload = ({
@@ -14,8 +15,12 @@ export const SecretFileUpload = ({
   title = "Upload your secret message",
   description = "This text file contains the message you want to hide.",
   emptyLabel = "Choose your secret text file",
+  readyLabel = "Ready to hide",
 }: SecretFileUploadProps) => {
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const selectedFile = event.target.files?.[0];
 
     if (!selectedFile) {
@@ -27,6 +32,7 @@ export const SecretFileUpload = ({
 
   return (
     <section className="workflow-card secret-card">
+
       <div className="section-heading">
         <div className="section-icon">
           <LockKeyhole size={20} />
@@ -40,7 +46,12 @@ export const SecretFileUpload = ({
       </div>
 
       <label className="secret-upload">
-        <input type="file" accept=".txt,.text" onChange={handleChange} />
+
+        <input
+          type="file"
+          accept=".txt,.text"
+          onChange={handleChange}
+        />
 
         {!file ? (
           <div className="secret-empty">
@@ -50,6 +61,7 @@ export const SecretFileUpload = ({
           </div>
         ) : (
           <div className="secret-file">
+
             <div className="secret-file-icon">
               <FileCheck size={24} />
             </div>
@@ -59,14 +71,20 @@ export const SecretFileUpload = ({
 
               <span>
                 {(file.size / 1024).toFixed(1)} KB
-                {" — "}Ready to hide
+                {" — "}
+                {readyLabel}
               </span>
             </div>
 
-            <span className="change-label">Change</span>
+            <span className="change-label">
+              Change
+            </span>
+
           </div>
         )}
+
       </label>
+
     </section>
   );
 };

@@ -9,6 +9,8 @@ import { MediaUploadCard } from "../../components/sender/MediaUploadCard";
 import { SecretFileUpload } from "../../components/sender/SecretFileUpload";
 import { ExtractedMessageCard } from "../../components/reciever/ExtractedMessageCard";
 import { ComparisonResultCard } from "../../components/reciever/ComparisonResultCard";
+import { ClearWorkflowButton } from "../../components/common/ClearWorkflowButton";
+import { getMediaType } from "../../utils/senderHelper";
 
 export const ReceiverDashboard = () => {
   const {
@@ -22,6 +24,7 @@ export const ReceiverDashboard = () => {
 
     extractResult,
     compareResult,
+    clearWorkflow,
   } = useReceiverWorkflow();
 
   const {
@@ -33,7 +36,13 @@ export const ReceiverDashboard = () => {
     changeNumberOfFiles,
     uploadMediaFile,
     uploadSecretFile,
+    clearWorkflow: clearSetupWorkflow,
   } = useSenderSetup();
+
+  const handleClearWorkflow = () => {
+    clearSetupWorkflow();
+    clearWorkflow();
+  };
 
   return (
     <div className="sender-page receiver-page">
@@ -48,6 +57,7 @@ export const ReceiverDashboard = () => {
         <div className="sender-column">
           <MethodSelector
             selectedMethods={selectedMethods}
+            disabled={isExtracted}
             onToggle={toggleMediaType}
             onMethodChange={changeMethod}
             onNumberOfFilesChange={changeNumberOfFiles}
@@ -106,41 +116,40 @@ export const ReceiverDashboard = () => {
       </div>
 
 
-      <div className="secret-upload-wrapper">
-        <SecretFileUpload
-          file={secretFile}
-          onUpload={uploadSecretFile}
-          title="Upload original text to confirm extracted message"
-          description="Add the original text file so the extracted output can be compared and verified."
-          emptyLabel="Choose the original text file"
-        />
-      </div>
 
-      {!isExtracted && (
-        <button
-          type="button"
-          className="continue-button"
-          disabled={isExtracting || isExtracted || uploadedFiles.length === 0}
-          onClick={() => extractMessage(uploadedFiles)}
-        >
-          {isExtracting
-            ? "Extracting..."
-            : "Extract Hidden Message"}
 
-          {!isExtracting && <span>→</span>}
-        </button>
-      )}
+
+      <button
+        type="button"
+        className="continue-button"
+        disabled={
+          isExtracting ||
+          isExtracted ||
+          uploadedFiles.length === 0
+        }
+        onClick={() => extractMessage(uploadedFiles)}
+      >
+        {isExtracting
+          ? "Extracting..."
+          : "Extract Hidden Message"}
+
+        {!isExtracting && <span>→</span>}
+      </button>
+
 
       {isExtracted && extractResult && (
         <ExtractedMessageCard
           message={extractResult.extractedMessage}
           totalParts={extractResult.mediaFiles}
+
+          originalFile={secretFile}
+          onOriginalFileUpload={uploadSecretFile}
+
           onCompare={() => verifyMessage(secretFile)}
-          disabled={
-            isVerified ||
-            isComparing ||
-            !secretFile
-          }
+
+          isComparing={isComparing}
+          disabled={isVerified || !secretFile}
+          hasOriginalFile={!!secretFile}
         />
       )}
 
@@ -158,23 +167,19 @@ export const ReceiverDashboard = () => {
         />
       )}
 
+      <ClearWorkflowButton
+        onClear={handleClearWorkflow}
+        disabled={
+          selectedMethods.length === 0 &&
+          uploadedFiles.length === 0 &&
+          !secretFile &&
+          !isExtracted &&
+          !isVerified
+        }
+      />
 
     </div>
   );
 };
 
-const getMediaType = (file: File): "image" | "video" | "audio" | "text" => {
-  if (file.type.startsWith("image/")) {
-    return "image";
-  }
 
-  if (file.type.startsWith("video/")) {
-    return "video";
-  }
-
-  if (file.type.startsWith("audio/")) {
-    return "audio";
-  }
-
-  return "text";
-};

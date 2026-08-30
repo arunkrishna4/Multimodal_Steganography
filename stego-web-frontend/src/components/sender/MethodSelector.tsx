@@ -12,6 +12,7 @@ interface MethodSelectorProps {
   onToggle: (mediaType: MediaType) => void;
   onMethodChange: (mediaType: MediaType, methodId: string) => void;
   onNumberOfFilesChange: (mediaType: MediaType, count: number) => void;
+  disabled?: boolean;
 
 }
 
@@ -22,9 +23,13 @@ export const MethodSelector = ({
   onToggle,
   onMethodChange,
   onNumberOfFilesChange,
+  disabled = false,
 }: MethodSelectorProps) => {
   return (
-    <section className="workflow-card">
+    <section
+      className={`workflow-card method-selector-card ${disabled ? "method-selector-disabled" : ""
+        }`}
+    >
       <div className="section-heading">
         <div className="section-icon">
           <Puzzle size={20} />
@@ -51,6 +56,7 @@ export const MethodSelector = ({
               option={option}
               selected={Boolean(selectedMethod)}
               selectedMethod={selectedMethod}
+              disabled={disabled}
               onToggle={() => onToggle(option.type)}
               onMethodChange={(methodId) =>
                 onMethodChange(option.type, methodId)

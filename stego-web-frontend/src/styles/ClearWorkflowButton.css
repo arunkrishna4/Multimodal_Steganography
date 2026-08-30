@@ -1,0 +1,59 @@
+.clear-workflow-button {
+    position: fixed;
+    right: 28px;
+    bottom: 28px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 11px 16px;
+
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+
+    background: var(--card-background);
+    color: var(--text-primary);
+
+    font-size: 16px;
+    font-weight: 600;
+
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+
+    cursor: pointer;
+
+    z-index: 1000;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.clear-workflow-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.16);
+}
+
+.clear-workflow-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.clear-workflow-button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .clear-workflow-button {
+        right: 18px;
+        bottom: 18px;
+
+        padding: 10px 13px;
+    }
+
+    .clear-workflow-button span {
+        display: none;
+    }
+}

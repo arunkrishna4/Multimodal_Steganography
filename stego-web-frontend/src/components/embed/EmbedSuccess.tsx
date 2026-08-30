@@ -14,7 +14,7 @@ export const EmbedSuccess = ({ fileCount }: EmbedSuccessProps) => {
       <h2>Message Hidden Successfully!</h2>
 
       <p>
-        Your secret is now embedded in <strong>{fileCount} files</strong>. Send
+        Your secret is now embedded in <strong>{fileCount} files</strong>. Download and send
         those files to the receiver.
       </p>
     </div>
