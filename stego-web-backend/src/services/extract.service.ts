@@ -104,7 +104,7 @@ const runPythonEngine = (
             // --------------------------------------------------
 
             const pythonProcess = spawn(
-                "python",
+                "python3",
                 [
                     pythonEnginePath,
                     "extract",
