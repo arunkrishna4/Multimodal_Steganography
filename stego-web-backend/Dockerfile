@@ -11,7 +11,11 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-# Copy backend source
+# Install Python dependencies
+COPY python/requirements.txt ./python/requirements.txt
+RUN pip3 install --break-system-packages --no-cache-dir -r python/requirements.txt
+
+# Copy application source
 COPY . .
 
 # Build TypeScript

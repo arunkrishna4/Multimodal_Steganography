@@ -71,7 +71,7 @@ const runPythonEngine = (
 
             const pythonScript = path.resolve(
                 process.cwd(),
-                "python3",
+                "python",
                 "stego_engine.py",
             );
 
