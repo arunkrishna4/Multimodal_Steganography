@@ -24,6 +24,12 @@ export const MediaUploadCard = ({
       return;
     }
 
+    if (mediaType === "image" && file.type !== "image/png") {
+      alert("Only PNG images are supported for steganography.");
+      event.target.value = "";
+      return;
+    }
+
     onUpload(mediaType, file, fileIndex);
   };
 
@@ -43,7 +49,7 @@ export const MediaUploadCard = ({
   const getAcceptType = () => {
     switch (mediaType) {
       case "image":
-        return "image/*";
+        return ".png,image/png";
 
       case "video":
         return "video/*";
