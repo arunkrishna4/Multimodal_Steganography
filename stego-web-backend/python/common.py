@@ -11,19 +11,25 @@ def text_to_binary(text):
 
 def binary_to_text(binary_string):
     """Convert a binary string back into UTF-8 text."""
+
     byte_list = []
 
     for i in range(0, len(binary_string), 8):
         byte_chunk = binary_string[i:i + 8]
 
         if len(byte_chunk) == 8:
-            byte_list.append(
-                int(byte_chunk, 2)
-            )
+            byte_list.append(int(byte_chunk, 2))
 
     byte_data = bytes(byte_list)
 
-    return byte_data.decode("utf-8")
+    try:
+        return byte_data.decode("utf-8")
+    except UnicodeDecodeError:
+        raise ValueError(
+            "Extracted data is not valid UTF-8. "
+            "The provided media file may not be a valid stego file "
+            "or its hidden data may have been corrupted."
+        )
 
 
 def int_to_fixed_binary(integer, num_bits):
