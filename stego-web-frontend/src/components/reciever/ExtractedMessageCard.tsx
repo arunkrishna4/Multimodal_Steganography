@@ -1,4 +1,4 @@
-import { CheckCircle2, Copy, FileText, Files, LoaderCircle } from "lucide-react";
+import { CheckCircle2, Copy, FileText, Files } from "lucide-react";
 import { useState } from "react";
 import { SecretFileUpload } from "../sender/SecretFileUpload";
 import "../../styles/ExtractedMessageCard.css";
