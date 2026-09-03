@@ -9,6 +9,8 @@ import {
 } from "lucide-react";
 
 import type { EmbedFile, MediaType } from "../../types/embed";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface EmbedFileCardProps {
   file: EmbedFile;
@@ -33,6 +35,7 @@ export const EmbedFileCard = ({
   onDownload,
 }: EmbedFileCardProps) => {
   const Icon = ICONS[file.mediaType];
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const isDone = file.status === "done";
   const isProcessing = file.status === "processing";
@@ -43,6 +46,19 @@ export const EmbedFileCard = ({
       : file.mediaType === "audio" && snr !== undefined
         ? { label: "SNR", value: `${snr.toFixed(2)} dB` }
         : null;
+
+  const handleDownload = async (downloadUrl: string) => {
+    if (isDownloading) return;
+
+    try {
+      setIsDownloading(true);
+      await onDownload(downloadUrl);
+    } catch (error) {
+      toast.error("Failed to download file.");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   return (
     <div className={`embed-file-card ${isDone ? "embed-file-done" : ""}`}>
@@ -80,10 +96,20 @@ export const EmbedFileCard = ({
           <button
             type="button"
             className="status-download"
-            onClick={() => onDownload(downloadUrl)}
+            onClick={() => handleDownload(downloadUrl)}
+            disabled={isDownloading}
           >
-            <Download size={16} />
-            Download
+            {isDownloading ? (
+              <>
+                <LoaderCircle className="spinner" size={18} />
+                Downloading...
+              </>
+            ) : (
+              <>
+                <Download size={18} />
+                Download
+              </>
+            )}
           </button>
         )}
 

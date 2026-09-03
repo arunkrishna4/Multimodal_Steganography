@@ -232,7 +232,8 @@
     flex-shrink: 0;
 
     padding: 10px 22px;
-
+    align-items: center;
+    justify-content: center;
     border: none;
     border-radius: 9px;
 
@@ -275,8 +276,6 @@
         flex-direction: column;
     }
 
-    .compare-message-button {
-        width: 100%;
-    }
+
 
 }

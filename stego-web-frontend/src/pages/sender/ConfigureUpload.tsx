@@ -14,6 +14,7 @@ import type { EmbedFile } from "../../types/embed";
 import { SplitProgress } from "../../components/embed/SplitProgress";
 import { ClearWorkflowButton } from "../../components/common/ClearWorkflowButton";
 import { getMediaType } from "../../utils/senderHelper";
+import { useEffect, useRef } from "react";
 
 export const ConfigureUpload = () => {
   const {
@@ -37,7 +38,16 @@ export const ConfigureUpload = () => {
     handleSplitAndEmbed,
   } = useSenderSetup();
 
-  //to be removed, just for testing.
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (embeded) {
+      resultsRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [embeded]);
 
 
   // Build one EmbedFile entry per uploaded carrier file
@@ -159,7 +169,7 @@ export const ConfigureUpload = () => {
 
 
       {embeded && splitInfo ? (
-        <div className="Results">
+        <div className="Results" ref={resultsRef}>
           <div style={{ marginTop: 20 }}>
             {/* // splitprogress is still visible after the condition */}
             {response?.success && response.files.length !== 1 && (

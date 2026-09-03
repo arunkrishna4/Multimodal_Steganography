@@ -10,6 +10,7 @@ import { ExtractedMessageCard } from "../../components/reciever/ExtractedMessage
 import { ComparisonResultCard } from "../../components/reciever/ComparisonResultCard";
 import { ClearWorkflowButton } from "../../components/common/ClearWorkflowButton";
 import { getMediaType } from "../../utils/senderHelper";
+import { useEffect, useRef } from "react";
 
 export const ReceiverDashboard = () => {
   const {
@@ -42,6 +43,17 @@ export const ReceiverDashboard = () => {
     clearSetupWorkflow();
     clearWorkflow();
   };
+
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isExtracted) {
+      resultsRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [isExtracted, isVerified]);
 
   return (
     <div className="sender-page receiver-page">
@@ -114,10 +126,6 @@ export const ReceiverDashboard = () => {
         </div>
       </div>
 
-
-
-
-
       <button
         type="button"
         className="continue-button"
@@ -137,33 +145,37 @@ export const ReceiverDashboard = () => {
 
 
       {isExtracted && extractResult && (
-        <ExtractedMessageCard
-          message={extractResult.extractedMessage}
-          totalParts={extractResult.mediaFiles}
+        <div ref={resultsRef}>
+          <ExtractedMessageCard
+            message={extractResult.extractedMessage}
+            totalParts={extractResult.mediaFiles}
 
-          originalFile={secretFile}
-          onOriginalFileUpload={uploadSecretFile}
+            originalFile={secretFile}
+            onOriginalFileUpload={uploadSecretFile}
 
-          onCompare={() => verifyMessage(secretFile)}
+            onCompare={() => verifyMessage(secretFile)}
 
-          isComparing={isComparing}
-          disabled={isVerified || !secretFile}
-          hasOriginalFile={!!secretFile}
-        />
+            isComparing={isComparing}
+            disabled={isVerified || !secretFile}
+            hasOriginalFile={!!secretFile}
+          />
+        </div>
       )}
 
       {isVerified && compareResult && (
-        <ComparisonResultCard
-          result={{
-            isMatch: compareResult.exactMatch,
-            originalLength: compareResult.originalLength,
-            extractedLength: compareResult.extractedLength,
-            matchingCharacters: compareResult.matchingCharacters,
-            errorCharacters: compareResult.errorCharacters,
-            errorRate: compareResult.errorRate,
-            accuracy: compareResult.accuracy,
-          }}
-        />
+        <div ref={resultsRef}>
+          <ComparisonResultCard
+            result={{
+              isMatch: compareResult.exactMatch,
+              originalLength: compareResult.originalLength,
+              extractedLength: compareResult.extractedLength,
+              matchingCharacters: compareResult.matchingCharacters,
+              errorCharacters: compareResult.errorCharacters,
+              errorRate: compareResult.errorRate,
+              accuracy: compareResult.accuracy,
+            }}
+          />
+        </div>
       )}
 
       <ClearWorkflowButton

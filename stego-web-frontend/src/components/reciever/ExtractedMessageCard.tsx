@@ -164,7 +164,6 @@ export const ExtractedMessageCard = ({
         >
           {isComparing ? (
             <>
-              <LoaderCircle size={15} className="spin" />
               Comparing...
             </>
           ) : isCompleted ? (
