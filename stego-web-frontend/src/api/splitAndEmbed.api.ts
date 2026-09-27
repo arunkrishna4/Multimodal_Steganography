@@ -3,10 +3,12 @@ import api from "./axios";
 import type {
     SplitEmbedResponse,
 } from "../types/api/split-and-embed.types";
+import type { SelectedMethod } from "../types/steganography";
 
 export const splitAndEmbed = async (
     originalFile: File,
     mediaFiles: File[],
+    selectedMethods: SelectedMethod[],
 ): Promise<SplitEmbedResponse> => {
 
     const formData = new FormData();
@@ -22,6 +24,11 @@ export const splitAndEmbed = async (
             file,
         );
     });
+
+    formData.append(
+        "selectedMethods",
+        JSON.stringify(selectedMethods),
+    );
 
     try {
 

@@ -13,6 +13,21 @@ export const STEGANOGRAPHY_MEDIA: MediaOption[] = [
         description:
           "Hide information by modifying the least significant bits.",
       },
+      {
+        id: "5-lsb-substitution",
+        name: "5th LSB Substitution",
+        description: "Hide information by modifying the 5th least significant bits.",
+      },
+      {
+        id: "6-lsb-substitution",
+        name: "6th LSB Substitution",
+        description: "Hide information by modifying the 6th least significant bits.",
+      },
+      {
+        id: "5&6-lsb-substitution",
+        name: "5th and 6th LSB Substitution",
+        description: "Hide information by modifying the 5th and 6th least significant bits.",
+      }
     ],
   },
 

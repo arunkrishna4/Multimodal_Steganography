@@ -4,48 +4,125 @@ from PIL import Image
 from common import fixed_binary_to_int
 
 
+# ============================================================
+# METHOD HELPERS
+# ============================================================
+
+def get_method_bits(method):
+    
+
+    methods = {
+        "lsb-substitution": [0],
+        "5-lsb-substitution": [4],
+        "6-lsb-substitution": [5],
+        "5&6-lsb-substitution": [4, 5],
+    }
+
+    if method not in methods:
+        raise ValueError(
+            f"Unsupported image steganography method: {method}"
+        )
+
+    return methods[method]
+
+
+def get_image_capacity(image_data, method):
+    """
+    Return the number of bits that can be stored in the image
+    using the selected method.
+    """
+
+    rows, cols = image_data.shape
+
+    bits_per_pixel = len(get_method_bits(method))
+
+    return rows * cols * bits_per_pixel
+
+
+# ============================================================
+# EMBED
+# ============================================================
+
 def embed_binary_in_image(
     image_path,
     full_binary_message_with_header,
     output_path,
+    method="lsb-substitution",
 ):
     """
-    Embed a binary message into the LSB of a grayscale image.
+    Embed a binary message into a grayscale image using
+    the selected steganography method.
     """
 
     img = Image.open(image_path).convert("L")
 
     original_image_data = np.array(img)
 
-    rows, cols = original_image_data.shape
-    capacity = rows * cols
+    bit_positions = get_method_bits(method)
+
+    capacity = get_image_capacity(
+        original_image_data,
+        method,
+    )
 
     if len(full_binary_message_with_header) > capacity:
         raise ValueError(
-            "Message (including header) is too long to embed in this image."
+            f"Message (including header) is too long for this image "
+            f"using {method}. "
+            f"Capacity: {capacity} bits, "
+            f"required: {len(full_binary_message_with_header)} bits."
         )
 
     stego_image_data = np.copy(original_image_data)
 
     message_index = 0
 
+    rows, cols = stego_image_data.shape
+
     for r in range(rows):
         for c in range(cols):
 
-            if message_index < len(full_binary_message_with_header):
+            if message_index >= len(
+                full_binary_message_with_header
+            ):
+                break
 
-                bit = int(full_binary_message_with_header[message_index])
+            pixel_value = int(
+                stego_image_data[r, c]
+            )
 
-                stego_image_data[r, c] = (
-                    stego_image_data[r, c] & 0xFE
-                ) | bit
+            # ------------------------------------------------
+            # Embed one or more bits into this pixel
+            # ------------------------------------------------
+
+            for bit_position in bit_positions:
+
+                if message_index >= len(
+                    full_binary_message_with_header
+                ):
+                    break
+
+                message_bit = int(
+                    full_binary_message_with_header[
+                        message_index
+                    ]
+                )
+
+                # Clear the selected bit.
+                pixel_value &= ~(1 << bit_position)
+
+                # Insert the message bit.
+                pixel_value |= (
+                    message_bit << bit_position
+                )
 
                 message_index += 1
 
-            else:
-                break
+            stego_image_data[r, c] = pixel_value
 
-        if message_index >= len(full_binary_message_with_header):
+        if message_index >= len(
+            full_binary_message_with_header
+        ):
             break
 
     stego_img = Image.fromarray(
@@ -57,50 +134,80 @@ def embed_binary_in_image(
     return stego_image_data, original_image_data
 
 
+# ============================================================
+# EXTRACT
+# ============================================================
+
 def extract_binary_from_image(
     stego_image_path,
     total_header_bits,
     sequence_bits,
     message_length_bits,
+    method="lsb-substitution",
 ):
     """
-    Extract the binary message and sequence number from an image.
+    Extract the binary message from an image using the
+    selected steganography method.
     """
 
-    stego_img = Image.open(stego_image_path).convert("L")
+    stego_img = Image.open(
+        stego_image_path
+    ).convert("L")
 
     stego_image_data = np.array(stego_img)
 
     rows, cols = stego_image_data.shape
 
-    total_pixels = rows * cols
+    bit_positions = get_method_bits(method)
 
-    if total_pixels < total_header_bits:
+    total_capacity = (
+        rows
+        * cols
+        * len(bit_positions)
+    )
+
+    if total_capacity < total_header_bits:
         raise ValueError(
             "Image is too small to contain message metadata."
         )
 
+    # ========================================================
     # Extract header
+    # ========================================================
+
     full_binary_header = ""
 
-    pixel_index = 0
+    message_bit_index = 0
 
     for r in range(rows):
         for c in range(cols):
 
-            if pixel_index < total_header_bits:
-
-                full_binary_header += str(
-                    stego_image_data[r, c] & 1
-                )
-
-                pixel_index += 1
-
-            else:
+            if message_bit_index >= total_header_bits:
                 break
 
-        if pixel_index >= total_header_bits:
+            pixel_value = int(
+                stego_image_data[r, c]
+            )
+
+            for bit_position in bit_positions:
+
+                if message_bit_index >= total_header_bits:
+                    break
+
+                bit = (
+                    pixel_value >> bit_position
+                ) & 1
+
+                full_binary_header += str(bit)
+
+                message_bit_index += 1
+
+        if message_bit_index >= total_header_bits:
             break
+
+    # ========================================================
+    # Parse header
+    # ========================================================
 
     sequence_binary_string = full_binary_header[
         0:sequence_bits
@@ -119,52 +226,75 @@ def extract_binary_from_image(
         length_binary_string
     )
 
-    start_pixel_index = total_header_bits
+    # ========================================================
+    # Validate capacity
+    # ========================================================
 
-    if total_pixels < start_pixel_index + message_length:
+    required_bits = (
+        total_header_bits
+        + message_length
+    )
+
+    if total_capacity < required_bits:
         raise ValueError(
             "Image does not contain the full message "
             "indicated by the header."
         )
 
+    # ========================================================
+    # Extract payload
+    # ========================================================
+
     extracted_binary_message = ""
 
-    current_pixel_index = 0
+    message_bit_index = 0
 
     for r in range(rows):
         for c in range(cols):
 
-            if (
-                current_pixel_index >= start_pixel_index
-                and current_pixel_index
-                < start_pixel_index + message_length
-            ):
-                extracted_binary_message += str(
-                    stego_image_data[r, c] & 1
-                )
+            pixel_value = int(
+                stego_image_data[r, c]
+            )
 
-            current_pixel_index += 1
+            for bit_position in bit_positions:
 
-            if (
-                current_pixel_index
-                >= start_pixel_index + message_length
-            ):
+                if message_bit_index < total_header_bits:
+                    message_bit_index += 1
+                    continue
+
+                if message_bit_index >= required_bits:
+                    break
+
+                bit = (
+                    pixel_value >> bit_position
+                ) & 1
+
+                extracted_binary_message += str(bit)
+
+                message_bit_index += 1
+
+            if message_bit_index >= required_bits:
                 break
 
-        if (
-            current_pixel_index
-            >= start_pixel_index + message_length
-        ):
+        if message_bit_index >= required_bits:
             break
 
-    return extracted_binary_message, sequence_number
+    return (
+        extracted_binary_message,
+        sequence_number,
+    )
 
+
+# ============================================================
+# PSNR
+# ============================================================
 
 def calculate_psnr(original_image, stego_image):
     """Calculate PSNR in dB."""
 
     mse = np.mean(
-        (original_image - stego_image) ** 2
+        (original_image.astype(np.float64)
+         - stego_image.astype(np.float64)) ** 2
     )
 
     if mse == 0:

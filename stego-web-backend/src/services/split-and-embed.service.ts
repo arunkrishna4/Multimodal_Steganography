@@ -15,6 +15,7 @@ import type {
 interface PythonMediaFile {
     type: "image" | "audio";
     input_path: string;
+    method?: string;
     output_path: string;
 }
 
@@ -36,13 +37,13 @@ interface PythonEmbedResult {
     files?: {
         sequence: number;
         mediaType: "image" | "audio";
+        method?: string;
         inputFile: string;
         outputFile: string;
         messageLength: number;
         messageBits: number;
         headerBits: number;
         totalBits: number;
-
         psnr?: number;
         snr?: number;
         sampleRate?: number;

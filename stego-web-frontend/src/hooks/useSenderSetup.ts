@@ -136,6 +136,10 @@ export const useSenderSetup = () => {
   //api call for the split and embed button
   const handleSplitAndEmbed = async () => {
     if (!secretFile) return;
+    if (selectedMethods.length === 0) {
+      toast.error("Please select a steganography method.");
+      return;
+    }
 
     try {
       setLoading(true);
@@ -144,6 +148,7 @@ export const useSenderSetup = () => {
         await splitAndEmbed(
           secretFile,
           uploadedFiles,
+          selectedMethods,
         );
 
       setResponse(result);

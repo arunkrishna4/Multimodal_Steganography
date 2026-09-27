@@ -95,12 +95,17 @@ def run_embed(message, media_files, output_dir):
 
         if media_type == "image":
 
+            method = media.get(
+                "method",
+                "lsb-substitution"
+            )
+
             stego_data, original_data = (
                 embed_binary_in_image(
                     image_path=input_path,
-                    full_binary_message_with_header=
-                        binary_with_header,
+                    full_binary_message_with_header = binary_with_header,
                     output_path=output_path,
+                    method=method,
                 )
             )
 
@@ -112,6 +117,7 @@ def run_embed(message, media_files, output_dir):
             results.append({
                 "sequence": index,
                 "mediaType": "image",
+                "method": method,
                 "inputFile": os.path.basename(
                     input_path
                 ),
@@ -214,6 +220,11 @@ def run_extract(media_files):
 
         if media_type == "image":
 
+            method = media.get(
+                "method",
+                "lsb-substitution"
+            )
+
             (
                 binary_message,
                 sequence_number,
@@ -222,6 +233,7 @@ def run_extract(media_files):
                 total_header_bits=TOTAL_HEADER_BITS,
                 sequence_bits=SEQUENCE_BITS,
                 message_length_bits=MESSAGE_LENGTH_BITS,
+                method=method,
             )
 
         # ====================================================
@@ -256,6 +268,7 @@ def run_extract(media_files):
         extracted_parts.append({
             "sequence": sequence_number,
             "mediaType": media_type,
+            "method": method,
             "file": os.path.basename(input_path),
             "message": extracted_text,
             "messageBits": len(binary_message),
@@ -290,6 +303,10 @@ def run_extract(media_files):
             {
                 "sequence": item["sequence"],
                 "mediaType": item["mediaType"],
+                "method": item.get(
+                    "method",
+                    "lsb-substitution"
+                ),
                 "file": item["file"],
                 "messageBits": item["messageBits"],
             }
