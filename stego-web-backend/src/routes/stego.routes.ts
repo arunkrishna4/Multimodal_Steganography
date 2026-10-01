@@ -40,6 +40,9 @@ const storage = multer.diskStorage({
 
 const uploadSplitAndEmbed = multer({
     storage,
+    limits: {
+        fileSize: 25 * 1024 * 1024,
+    },
 });
 
 router.post(
@@ -51,7 +54,7 @@ router.post(
         },
         {
             name: "mediaFiles",
-            maxCount: 20,
+            maxCount: 5,
         },
     ]),
     splitAndEmbedController,
@@ -66,7 +69,7 @@ const uploadExtract = multer({
 router.post("/extract", uploadExtract.fields([
     {
         name: "stegoFiles",
-        maxCount: 20,
+        maxCount: 5,
     },
 ]), extract);
 

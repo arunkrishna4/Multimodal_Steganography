@@ -1,6 +1,7 @@
 import sys
 import json
 import os
+import gc
 
 from common import text_to_binary, binary_to_text
 
@@ -114,6 +115,10 @@ def run_embed(message, media_files, output_dir):
                 stego_data,
             )
 
+            #delete after calculation 
+            del original_data
+            del stego_data
+
             results.append({
                 "sequence": index,
                 "mediaType": "image",
@@ -174,6 +179,9 @@ def run_embed(message, media_files, output_dir):
             raise ValueError(
                 f"Unsupported media type: {media_type}"
             )
+        
+        #collect garbage
+        gc.collect()
 
     # --------------------------------------------------------
     # Return result

@@ -54,9 +54,11 @@ def embed_binary_in_image(
     the selected steganography method.
     """
 
-    img = Image.open(image_path).convert("L")
-
-    original_image_data = np.array(img)
+    with Image.open(image_path) as img:
+        original_image_data = np.array(
+            img.convert("L"),
+            dtype=np.uint8,
+        )
 
     bit_positions = get_method_bits(method)
 
