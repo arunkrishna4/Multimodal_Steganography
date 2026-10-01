@@ -134,7 +134,7 @@ export const ReceiverDashboard = () => {
           isExtracted ||
           uploadedFiles.length === 0
         }
-        onClick={() => extractMessage(uploadedFiles)}
+        onClick={() => extractMessage(uploadedFiles, selectedMethods)}
       >
         {isExtracting
           ? "Extracting..."

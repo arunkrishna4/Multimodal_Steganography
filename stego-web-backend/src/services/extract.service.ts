@@ -9,6 +9,7 @@ import type {
 
 interface PythonMediaFile {
     type: "image" | "audio";
+    method: string;
     input_path: string;
 }
 

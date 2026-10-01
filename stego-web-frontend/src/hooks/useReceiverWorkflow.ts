@@ -3,8 +3,10 @@ import { useMemo, useState } from "react";
 import type {
   ExtractionItem,
   ReceivedMediaFile,
+  SelectedMethod,
   TransmissionDetails,
   VerificationResult,
+
 } from "../types/steganography";
 
 import type {
@@ -79,6 +81,7 @@ export const useReceiverWorkflow = () => {
 
   const extractMessage = async (
     mediaFiles: File[],
+    selectedMethods: SelectedMethod[],
   ) => {
 
     if (isExtracting || isExtracted) {
@@ -106,7 +109,10 @@ export const useReceiverWorkflow = () => {
       setExtractResult(null);
 
 
-      const response = await extractMessageApi(mediaFiles) as any;
+      const response = await extractMessageApi(
+        mediaFiles,
+        selectedMethods,
+      ) as any;
 
       // --------------------------------------------------
       // Handle backend error response

@@ -35,7 +35,7 @@ export const extract = async (
         for (const file of stegoFiles) {
 
             const isImage =
-                file.mimetype === "image/jpeg" ||
+
                 file.mimetype === "image/png";
 
             const isAudio =
@@ -53,7 +53,34 @@ export const extract = async (
             }
         }
 
-        // 3. Prepare media files for Python service
+
+        // 3. Get selected methods
+        const selectedMethodsRaw = req.body.selectedMethods;
+
+        if (!selectedMethodsRaw) {
+            return res.status(400).json({
+                success: false,
+                error: "Missing required field: selectedMethods.",
+            });
+        }
+
+        let selectedMethods: {
+            mediaType: "image" | "audio";
+            methodId: string;
+            numberOfFiles: number;
+        }[];
+
+        try {
+            selectedMethods = JSON.parse(selectedMethodsRaw);
+        } catch {
+            return res.status(400).json({
+                success: false,
+                error: "Invalid selectedMethods data.",
+            });
+        }
+
+
+        // 4. Prepare media files for Python service
         const pythonMediaFiles = stegoFiles.map((file) => {
             let mediaType: "image" | "audio";
 
@@ -63,17 +90,28 @@ export const extract = async (
                 mediaType = "audio";
             }
 
+            const selectedMethod = selectedMethods.find(
+                (item) => item.mediaType === mediaType
+            );
+
+            if (!selectedMethod) {
+                throw new Error(
+                    `No steganography method selected for ${mediaType}.`
+                );
+            }
+
             return {
                 type: mediaType,
+                method: selectedMethod.methodId,
                 input_path: file.path,
             };
         });
 
 
-        // 4. Call service
+        // 5. Call service
         const result = await extractMessage(pythonMediaFiles);
 
-        // 5. Return frontend response
+        // 6. Return frontend response
         return res.status(200).json({
             success: true,
             result: {

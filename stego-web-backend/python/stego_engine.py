@@ -214,16 +214,16 @@ def run_extract(media_files):
         media_type = media["type"]
         input_path = media["input_path"]
 
+        method = media.get(
+            "method",
+            "lsb-substitution"
+        )
+
         # ====================================================
         # IMAGE
         # ====================================================
 
         if media_type == "image":
-
-            method = media.get(
-                "method",
-                "lsb-substitution"
-            )
 
             (
                 binary_message,
