@@ -180,48 +180,44 @@ const runPythonEngine = (
             // Python process finished
             // --------------------------------------------------
 
-            pythonProcess.on(
-                "close",
-                async (code) => {
+            pythonProcess.on("close", async (code, signal) => {
 
-                    // Delete temporary config
-                    await fs.unlink(
-                        configPath,
-                    ).catch(() => { });
+                // Delete temporary config
+                await fs.unlink(
+                    configPath,
+                ).catch(() => { });
 
 
-                    // Python failed
-                    if (code !== 0) {
-
-                        reject(
-                            new Error(
-                                stderr ||
-                                stdout ||
-                                `Python engine exited with code ${code}`,
-                            ),
-                        );
-
-                        return;
-                    }
+                // Python failed
+                if (code !== 0) {
+                    reject(
+                        new Error(
+                            stderr ||
+                            stdout ||
+                            `Python engine exited with code ${code}, signal ${signal}.`
+                        )
+                    );
+                    return;
+                }
 
 
-                    // Parse Python response
-                    try {
+                // Parse Python response
+                try {
 
-                        const result =
-                            JSON.parse(stdout);
+                    const result =
+                        JSON.parse(stdout);
 
-                        resolve(result);
+                    resolve(result);
 
-                    } catch {
+                } catch {
 
-                        reject(
-                            new Error(
-                                "Python engine returned an invalid response.",
-                            ),
-                        );
-                    }
-                },
+                    reject(
+                        new Error(
+                            "Python engine returned an invalid response.",
+                        ),
+                    );
+                }
+            },
             );
 
         } catch (error) {
