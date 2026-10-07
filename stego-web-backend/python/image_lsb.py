@@ -294,10 +294,16 @@ def extract_binary_from_image(
 def calculate_psnr(original_image, stego_image):
     """Calculate PSNR in dB."""
 
-    mse = np.mean(
-        (original_image.astype(np.float64)
-         - stego_image.astype(np.float64)) ** 2
+    difference = (
+        original_image.astype(np.int16)
+        - stego_image.astype(np.int16)
     )
+
+    mse = np.mean(
+        difference.astype(np.float32) ** 2
+    )
+
+    del difference
 
     if mse == 0:
         return float("inf")

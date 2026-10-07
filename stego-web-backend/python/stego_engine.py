@@ -114,6 +114,7 @@ def run_embed(message, media_files, output_dir):
                 original_data,
                 stego_data,
             )
+            
 
             #delete after calculation 
             del original_data
