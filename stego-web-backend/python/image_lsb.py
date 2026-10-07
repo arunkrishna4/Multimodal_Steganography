@@ -310,6 +310,8 @@ def calculate_psnr(original_image, stego_image):
 
     max_pixel = 255.0
 
-    return 20 * np.log10(
+    return float(
+    20 * np.log10(
         max_pixel / np.sqrt(mse)
     )
+)
