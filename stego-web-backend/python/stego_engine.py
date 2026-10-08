@@ -2,6 +2,7 @@ import sys
 import json
 import os
 import gc
+import resource
 
 from common import text_to_binary, binary_to_text
 
@@ -26,6 +27,12 @@ from audio_lsb import (
     calculate_snr,
 )
 
+
+def log_memory(label):
+    usage = resource.getrusage(resource.RUSAGE_SELF)
+    memory_mb = usage.ru_maxrss / 1024
+
+    print(f"[MEMORY] {label}: {memory_mb:.2f} MB")
 
 # ============================================================
 # EMBED
@@ -96,10 +103,14 @@ def run_embed(message, media_files, output_dir):
 
         if media_type == "image":
 
+            log_memory("before image processing")
             method = media.get(
                 "method",
                 "lsb-substitution"
             )
+
+        
+            log_memory("after image loading")
 
             stego_data, original_data = (
                 embed_binary_in_image(
@@ -110,16 +121,22 @@ def run_embed(message, media_files, output_dir):
                 )
             )
 
+            log_memory("after embedding")
             psnr = calculate_psnr(
                 original_data,
                 stego_data,
             )
+
+            log_memory("after PSNR")
+
+            log_memory("after saving")
             
 
             #delete after calculation 
             del original_data
             del stego_data
-
+            
+            log_memory("after cleanup")
             results.append({
                 "sequence": index,
                 "mediaType": "image",
