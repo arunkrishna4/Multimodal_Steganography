@@ -32,7 +32,11 @@ def log_memory(label):
     usage = resource.getrusage(resource.RUSAGE_SELF)
     memory_mb = usage.ru_maxrss / 1024
 
-    print(f"[MEMORY] {label}: {memory_mb:.2f} MB")
+    print(
+        f"[MEMORY] {label}: {memory_mb:.2f} MB",
+        file=sys.stderr,
+        flush=True,
+    )
 
 # ============================================================
 # EMBED
