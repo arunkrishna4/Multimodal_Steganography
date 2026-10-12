@@ -12,6 +12,8 @@ export const compareMessages = (
         extractedMessage,
     } = request;
 
+    const MAX_LEVENSHTEIN_LENGTH = 10_000;
+
 
     // -----------------------------------------------
     // Basic lengths
@@ -32,97 +34,95 @@ export const compareMessages = (
         originalMessage === extractedMessage;
 
 
-    // -----------------------------------------------
-    // Levenshtein Edit Distance
-    //
-    // Optimized implementation:
-    // Uses O(n) memory instead of O(n²)
-    // -----------------------------------------------
+    let editDistance: number | null = null;
 
-    let source = originalMessage;
-    let target = extractedMessage;
+    if (exactMatch) {
 
-    /*
-     * Keep the shorter string as the target.
-     * This minimizes memory usage.
-     */
-    if (source.length < target.length) {
-        [source, target] =
-            [target, source];
-    }
+        editDistance = 0;
 
-    const sourceLength =
-        source.length;
-
-    const targetLength =
-        target.length;
-
-
-    let previousRow =
-        new Array<number>(
-            targetLength + 1,
-        );
-
-    let currentRow =
-        new Array<number>(
-            targetLength + 1,
-        );
-
-
-    // Initial row
-    for (
-        let j = 0;
-        j <= targetLength;
-        j++
-    ) {
-        previousRow[j] = j;
-    }
-
-
-    // Calculate distance
-    for (
-        let i = 1;
-        i <= sourceLength;
-        i++
+    } else if (
+        originalMessage.length <= MAX_LEVENSHTEIN_LENGTH &&
+        extractedMessage.length <= MAX_LEVENSHTEIN_LENGTH
     ) {
 
-        currentRow[0] = i;
+        let source = originalMessage;
+        let target = extractedMessage;
 
+        /*
+         * Keep the shorter string as the target.
+         * This minimizes memory usage.
+         */
+        if (source.length < target.length) {
+            [source, target] =
+                [target, source];
+        }
 
+        const sourceLength =
+            source.length;
+
+        const targetLength =
+            target.length;
+
+        let previousRow =
+            new Array<number>(
+                targetLength + 1,
+            );
+
+        let currentRow =
+            new Array<number>(
+                targetLength + 1,
+            );
+
+        // Initial row
         for (
-            let j = 1;
+            let j = 0;
             j <= targetLength;
             j++
         ) {
-
-            const cost =
-                source[i - 1] === target[j - 1]
-                    ? 0
-                    : 1;
-
-
-            currentRow[j] =
-                Math.min(
-                    currentRow[j - 1] + 1,
-                    previousRow[j] + 1,
-                    previousRow[j - 1] + cost,
-                );
+            previousRow[j] = j;
         }
 
+        // Calculate distance
+        for (
+            let i = 1;
+            i <= sourceLength;
+            i++
+        ) {
 
-        // Swap rows
-        [
-            previousRow,
-            currentRow,
-        ] = [
-                currentRow,
+            currentRow[0] = i;
+
+            for (
+                let j = 1;
+                j <= targetLength;
+                j++
+            ) {
+
+                const cost =
+                    source[i - 1] === target[j - 1]
+                        ? 0
+                        : 1;
+
+                currentRow[j] =
+                    Math.min(
+                        currentRow[j - 1] + 1,
+                        previousRow[j] + 1,
+                        previousRow[j - 1] + cost,
+                    );
+            }
+
+            // Swap rows
+            [
                 previousRow,
-            ];
+                currentRow,
+            ] = [
+                    currentRow,
+                    previousRow,
+                ];
+        }
+
+        editDistance =
+            previousRow[targetLength];
     }
-
-
-    const editDistance =
-        previousRow[targetLength];
 
 
     // -----------------------------------------------
@@ -145,18 +145,24 @@ export const compareMessages = (
 
     let matchingCharacters = 0;
 
+    if (exactMatch) {
 
-    for (
-        let i = 0;
-        i < comparisonLength;
-        i++
-    ) {
+        matchingCharacters = originalLength;
 
-        if (
-            originalMessage[i] ===
-            extractedMessage[i]
+    } else {
+
+        for (
+            let i = 0;
+            i < comparisonLength;
+            i++
         ) {
-            matchingCharacters++;
+
+            if (
+                originalMessage[i] ===
+                extractedMessage[i]
+            ) {
+                matchingCharacters++;
+            }
         }
     }
 
@@ -216,7 +222,6 @@ export const compareMessages = (
 
         errorCharacters,
 
-        editDistance,
 
         similarity,
 

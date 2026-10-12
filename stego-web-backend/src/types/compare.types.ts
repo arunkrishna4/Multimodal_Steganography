@@ -9,7 +9,7 @@ export interface CompareResult {
     extractedLength: number;
     matchingCharacters: number;
     errorCharacters: number;
-    editDistance: number;
+    editDistance?: number;
     similarity: number;
     errorRate: number;
     accuracy: number;
