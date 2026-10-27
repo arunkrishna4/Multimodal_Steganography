@@ -19,6 +19,7 @@ import type { CompareResult } from "../types/api/compare";
 import { toast } from "sonner";
 import type { AxiosError } from "axios";
 
+
 export const useReceiverWorkflow = () => {
 
   const [isExtracting, setIsExtracting] = useState(false);
@@ -73,6 +74,10 @@ export const useReceiverWorkflow = () => {
     (total, file) => total + file.fileSize,
     0,
   );
+
+
+
+
 
 
   // --------------------------------------------------
@@ -154,6 +159,9 @@ export const useReceiverWorkflow = () => {
 
     }
   };
+
+
+
 
 
   // --------------------------------------------------

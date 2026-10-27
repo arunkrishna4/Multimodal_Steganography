@@ -40,3 +40,31 @@ export const extractMessage = async (
         throw error;
     }
 };
+
+export const downloadExtractedMessage = async (
+    extractedMessage: string,
+): Promise<Blob> => {
+
+    try {
+        const response = await api.post(
+            "/extract/download",
+            extractedMessage,
+            {
+                headers: {
+                    "Content-Type": "text/plain",
+                },
+                responseType: "blob",
+            },
+        );
+
+        return response.data;
+
+    } catch (error) {
+        console.error(
+            "Error downloading extracted message:",
+            error,
+        );
+
+        throw error;
+    }
+};

@@ -9,6 +9,36 @@ import {
 } from "../services/extract.service";
 
 
+// --------------------------------------------------
+// extracted msg conversion to txt file
+// --------------------------------------------------
+
+export const downloadExtractedMessage = (
+    req: Request,
+    res: Response,
+) => {
+    const extractedMessage = req.body;
+
+    if (typeof extractedMessage !== "string") {
+        return res.status(400).json({
+            success: false,
+            error: "Extracted message must be provided as plain text.",
+        });
+    }
+
+    res.setHeader(
+        "Content-Type",
+        "text/plain; charset=utf-8",
+    );
+
+    res.setHeader(
+        "Content-Disposition",
+        'attachment; filename="extracted-message.txt"',
+    );
+
+    return res.status(200).send(extractedMessage);
+};
+
 export const extract = async (
     req: Request,
     res: Response<ExtractResponse>

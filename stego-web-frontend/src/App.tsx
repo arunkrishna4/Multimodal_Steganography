@@ -4,6 +4,7 @@ import { Sidebar } from "./components/layout/Sidebar";
 
 import { ConfigureUpload } from "./pages/sender/ConfigureUpload";
 import { ReceiverDashboard } from "./pages/reciever/ReceiverDashboard";
+import { CompareMessage } from "./pages/compare/compare";
 import { Toaster } from "sonner";
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
             <Route path="/sender/configure" element={<ConfigureUpload />} />
 
             <Route path="/receiver" element={<ReceiverDashboard />} />
+            <Route path="/compare" element={<CompareMessage />} />
 
             <Route
               path="*"

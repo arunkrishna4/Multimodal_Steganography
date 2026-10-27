@@ -1,7 +1,7 @@
 import {
   Shield,
   Send,
-  // History,
+  BookOpenCheck,
   Inbox,
   // Settings,
   // Info,
@@ -45,12 +45,16 @@ export const Sidebar = () => {
           <span>Receiver</span>
         </NavLink>
 
-        {/* <button className="nav-item">
-          <History size={18} />
-          <span>History</span>
-        </button>
+        <NavLink
+          to="/compare/compare"
+          className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+        >
+          <BookOpenCheck size={18} />
+          <span>Compare</span>
 
-        <button className="nav-item">
+        </NavLink>
+
+        {/*<button className="nav-item">
           <Settings size={18} />
           <span>Settings</span>
         </button>

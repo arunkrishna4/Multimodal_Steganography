@@ -1,10 +1,11 @@
 import { Router } from "express";
+import express from "express";
 import { compare } from "../controllers/compare.controller";
 import multer from "multer";
 import { splitAndEmbedController } from "../controllers/split-and-embed.controller";
 import path from "path";
 import fs from "fs";
-import { extract } from "../controllers/extract.controller";
+import { downloadExtractedMessage, extract } from "../controllers/extract.controller";
 
 const router = Router();
 
@@ -72,6 +73,16 @@ router.post("/extract", uploadExtract.fields([
         maxCount: 5,
     },
 ]), extract);
+
+//converting extracted msg to a txt file
+router.post(
+    "/extract/download",
+    express.text({
+        type: "text/plain",
+        limit: "80mb",
+    }),
+    downloadExtractedMessage,
+);
 
 
 //multer configuration for file upload
