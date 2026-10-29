@@ -21,6 +21,8 @@ export const ReceiverDashboard = () => {
 
     extractMessage,
     verifyMessage,
+    handleDownloadExtractedMessage,
+    isDownloading,
 
     extractResult,
     compareResult,
@@ -154,7 +156,8 @@ export const ReceiverDashboard = () => {
             onOriginalFileUpload={uploadSecretFile}
 
             onCompare={() => verifyMessage(secretFile)}
-
+            onDownload={handleDownloadExtractedMessage}
+            isDownloading={isDownloading}
             isComparing={isComparing}
             disabled={isVerified || !secretFile}
             hasOriginalFile={!!secretFile}

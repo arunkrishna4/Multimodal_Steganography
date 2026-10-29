@@ -13,7 +13,7 @@ import type {
   ExtractResult,
 } from "../types/receiver";
 
-import { extractMessage as extractMessageApi } from "../api/extract.api";
+import { extractMessage as extractMessageApi, downloadExtractedMessage as downloadExtractedMessageApi } from "../api/extract.api";
 import { compareMessages as compareMessagesApi } from "../api/compare.api";
 import type { CompareResult } from "../types/api/compare";
 import { toast } from "sonner";
@@ -27,6 +27,8 @@ export const useReceiverWorkflow = () => {
   const [isExtracted, setIsExtracted] = useState(false);
 
   const [isVerified, setIsVerified] = useState(false);
+
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const [extractResult, setExtractResult] =
     useState<ExtractResult | null>(null);
@@ -74,8 +76,6 @@ export const useReceiverWorkflow = () => {
     (total, file) => total + file.fileSize,
     0,
   );
-
-
 
 
 
@@ -160,10 +160,6 @@ export const useReceiverWorkflow = () => {
     }
   };
 
-
-
-
-
   // --------------------------------------------------
   // Verification
   // --------------------------------------------------
@@ -217,6 +213,42 @@ export const useReceiverWorkflow = () => {
     }
   };
 
+  // --------------------------------------------------
+  // download Extracted message
+  // --------------------------------------------------
+  const handleDownloadExtractedMessage = async () => {
+    const message = extractResult?.extractedMessage;
+
+    if (typeof message !== "string") {
+      toast.error("No extracted message available to download.");
+      return;
+    }
+
+    setIsDownloading(true);
+
+    try {
+      const blob = await downloadExtractedMessageApi(message);
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = "extracted-message.txt";
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Extracted message downloaded!");
+    } catch {
+      toast.error("Failed to download extracted message.");
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const clearWorkflow = () => {
     setIsExtracting(false);
     setIsExtracted(false);
@@ -241,6 +273,8 @@ export const useReceiverWorkflow = () => {
     transmissionDetails,
     verificationResult,
 
+    handleDownloadExtractedMessage,
+    isDownloading,
     totalSize,
 
     isExtracting,

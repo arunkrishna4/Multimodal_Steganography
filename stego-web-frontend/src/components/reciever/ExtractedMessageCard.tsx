@@ -1,5 +1,5 @@
-import { CheckCircle2, Copy, FileText, Files } from "lucide-react";
-import { useState } from "react";
+import { CheckCircle2, Copy, FileText, Files, FileDown, LoaderCircle } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { SecretFileUpload } from "../sender/SecretFileUpload";
 import "../../styles/ExtractedMessageCard.css";
 
@@ -11,6 +11,8 @@ interface ExtractedMessageCardProps {
   onOriginalFileUpload: (file: File) => void;
 
   onCompare: () => void;
+  onDownload: () => void;
+  isDownloading?: boolean;
 
   disabled?: boolean;
   isComparing?: boolean;
@@ -24,19 +26,35 @@ export const ExtractedMessageCard = ({
   originalFile,
   onOriginalFileUpload,
   onCompare,
+  onDownload,
+  isDownloading = false,
   disabled = false,
   isComparing = false,
   hasOriginalFile = false,
 }: ExtractedMessageCardProps) => {
   const [copied, setCopied] = useState(false);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
+    };
+  }, []);
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(message);
       setCopied(true);
 
-      setTimeout(() => {
+      if (copyTimerRef.current) {
+        clearTimeout(copyTimerRef.current);
+      }
+
+      copyTimerRef.current = setTimeout(() => {
         setCopied(false);
+        copyTimerRef.current = null;
       }, 2000);
     } catch (error) {
       console.error("Failed to copy message:", error);
@@ -102,16 +120,35 @@ export const ExtractedMessageCard = ({
               This is the message reconstructed from the stego files.
             </p>
           </div>
+          <div className="extracted-text-actions">
+            <button
+              type="button"
+              className="copy-message-button"
+              onClick={handleCopy}
+            >
+              <Copy size={15} />
 
-          <button
-            type="button"
-            className="copy-message-button"
-            onClick={handleCopy}
-          >
-            <Copy size={15} />
-
-            {copied ? "Copied" : "Copy"}
-          </button>
+              {copied ? "Copied" : "Copy"}
+            </button>
+            <button
+              type="button"
+              className="download-message-button"
+              onClick={onDownload}
+              disabled={isDownloading}
+            >
+              {isDownloading ? (
+                <>
+                  <LoaderCircle size={17} className="download-spinner" />
+                  Downloading...
+                </>
+              ) : (
+                <>
+                  <FileDown size={17} />
+                  Download extracted message
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         <div className="extracted-message-box">

@@ -1,0 +1,242 @@
+.compare-dashboard {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.compare-page-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.compare-page-icon,
+.compare-upload-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #c76532;
+}
+
+.compare-page-header h1,
+.compare-upload-heading h2 {
+    margin: 0 0 6px;
+}
+
+.compare-page-header p,
+.compare-upload-heading p {
+    margin: 0;
+    opacity: 0.75;
+    line-height: 1.5;
+}
+
+.compare-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.compare-text-upload {
+    min-width: 0;
+    padding: 22px;
+    border: 1px solid var(--border-color, #e2e2e2);
+    border-radius: 14px;
+    background: var(--card-background, #ffffff);
+}
+
+.compare-upload-heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.compare-file-dropzone {
+    width: 100%;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border: 1px dashed #c76532;
+    border-radius: 10px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+
+.compare-file-dropzone svg {
+    color: #c76532;
+}
+
+.compare-file-dropzone span,
+.compare-selected-file span {
+    font-size: 13px;
+    opacity: 0.7;
+}
+
+.compare-selected-file {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 10px;
+    background: var(--muted-background, #f7f7f7);
+}
+
+.compare-file-details {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    overflow-wrap: anywhere;
+}
+
+.compare-selected-file button {
+    display: flex;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+
+.compare-paste-section {
+    margin-top: 20px;
+}
+
+.compare-paste-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.compare-paste-section textarea {
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;
+    padding: 12px;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 8px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+}
+
+.compare-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 28px 0;
+}
+
+.compare-submit-button,
+.compare-reset-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font: inherit;
+    cursor: pointer;
+}
+
+.compare-submit-button {
+    border: 1px solid #c76532;
+    background: #c76532;
+    color: white;
+}
+
+.compare-reset-button {
+    border: 1px solid var(--border-color, #ddd);
+    background: transparent;
+    color: inherit;
+}
+
+.compare-submit-button:disabled,
+.compare-reset-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.compare-spinner {
+    animation: compare-spin 1s linear infinite;
+}
+
+@keyframes compare-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.compare-error {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: #b42318;
+    background: #fff0ee;
+}
+
+.compare-result-container {
+    margin-top: 24px;
+}
+
+@media (max-width: 768px) {
+    .compare-dashboard {
+        padding: 16px;
+    }
+
+    .compare-upload-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .compare-actions {
+        flex-direction: column;
+    }
+
+    .compare-submit-button,
+    .compare-reset-button {
+        width: 100%;
+    }
+}
+
+.compare-input-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    padding: 4px;
+    margin-bottom: 18px;
+    border-radius: 10px;
+    background: var(--muted-background, #f3f3f3);
+}
+
+.compare-input-switch button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    border: 0;
+    border-radius: 7px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.compare-input-switch button.active {
+    background: var(--card-background, #ffffff);
+    color: #c76532;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 10%);
+    font-weight: 600;
+}
+
+.compare-input-switch button:focus-visible {
+    outline: 2px solid #c76532;
+    outline-offset: 2px;
+}

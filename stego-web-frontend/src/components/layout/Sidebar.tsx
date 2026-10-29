@@ -1,8 +1,8 @@
 import {
   Shield,
   Send,
-  BookOpenCheck,
   Inbox,
+  GitCompare,
   // Settings,
   // Info,
   // Download,
@@ -46,10 +46,10 @@ export const Sidebar = () => {
         </NavLink>
 
         <NavLink
-          to="/compare/compare"
+          to="/compare"
           className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
         >
-          <BookOpenCheck size={18} />
+          <GitCompare size={18} />
           <span>Compare</span>
 
         </NavLink>

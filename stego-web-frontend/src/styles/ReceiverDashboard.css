@@ -356,7 +356,7 @@
   font-size: 16px;
 }
 
-.extracted-message-card > p {
+.extracted-message-card>p {
   margin: 12px 0;
   color: #20c85b;
   font-size: 14px;
