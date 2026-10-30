@@ -15,6 +15,7 @@ export const CompareDashboard = () => {
         extractedText,
         setExtractedText,
         isComparing,
+        isCompleted,
         error,
         compareResponse,
         handleCompare,
@@ -76,7 +77,9 @@ export const CompareDashboard = () => {
                     disabled={
                         isComparing ||
                         !hasOriginalInput ||
-                        !hasExtractedInput
+                        !hasExtractedInput ||
+                        isCompleted
+
                     }
                 >
                     {isComparing ? (

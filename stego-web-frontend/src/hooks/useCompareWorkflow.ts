@@ -11,6 +11,7 @@ export const useCompareWorkflow = () => {
 
     const [isComparing, setIsComparing] = useState(false);
     const [error, setError] = useState("");
+    const [isCompleted, setisCompleted] = useState(false)
 
     const [compareResponse, setCompareResponse] =
         useState<CompareResponse | null>(null);
@@ -51,6 +52,7 @@ export const useCompareWorkflow = () => {
             }
 
             setCompareResponse(response);
+            setisCompleted(true)
         } catch {
             setError("Unable to compare messages. Please try again.");
         } finally {
@@ -81,6 +83,7 @@ export const useCompareWorkflow = () => {
         setExtractedText,
 
         isComparing,
+        isCompleted,
         error,
         compareResponse,
 

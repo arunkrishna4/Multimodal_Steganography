@@ -79,12 +79,14 @@ export const CompareTextUpload = ({
     return (
         <section className="compare-text-upload">
             <div className="compare-upload-heading">
-                <div className="compare-upload-icon">
-                    <FileText size={22} />
+                <div className="background-icon-box">
+                    <div className="compare-upload-icon">
+                        <FileText size={22} />
+                    </div>
                 </div>
 
                 <div>
-                    <h3>{title}</h3>
+                    <h4>{title}</h4>
                     <p>{description}</p>
                 </div>
             </div>
@@ -160,9 +162,6 @@ export const CompareTextUpload = ({
 
             {inputMode === "paste" && (
                 <div className="compare-paste-section">
-                    <label htmlFor={textareaId}>
-                        {title}
-                    </label>
 
                     <textarea
                         id={textareaId}
