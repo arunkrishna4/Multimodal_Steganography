@@ -1,74 +1,61 @@
-import { Request, Response } from "express";
-
-import {
+import type { Request, Response } from "express";
+import { compareMessages } from "../services/compare.service";
+import type {
     CompareRequest,
     CompareResponse,
 } from "../types/compare.types";
 
-import { compareMessages } from "../services/compare.service";
-
 export const compare = (
     req: Request,
-    res: Response<CompareResponse>
+    res: Response<CompareResponse>,
 ) => {
+    const { originalMessage: rawOriginalMessage, extractedMessage } =
+        req.body ?? {};
 
-    // Check original file
-    if (!req.file) {
-        return res.status(400).json({
-            success: false,
-            error: "Missing required field: originalFile.",
-        });
+    let originalMessage: string;
+
+    // Original message from uploaded file
+    if (req.file) {
+        const isTextFile =
+            req.file.mimetype === "text/plain" ||
+            req.file.originalname.toLowerCase().endsWith(".txt");
+
+        if (!isTextFile) {
+            return res.status(400).json({
+                success: false,
+                error: "Invalid file: originalFile must be a .txt file.",
+            });
+        }
+
+        originalMessage = req.file.buffer.toString("utf-8");
     }
-
-
-    // Check extracted message
-    const { extractedMessage } = req.body;
-
-    if (extractedMessage === undefined) {
+    // Original message from pasted text / JSON request
+    else if (typeof rawOriginalMessage === "string") {
+        originalMessage = rawOriginalMessage;
+    } else {
         return res.status(400).json({
             success: false,
-            error: "Missing required field: extractedMessage.",
+            error: "Missing required field: originalFile or originalMessage.",
         });
     }
 
     if (typeof extractedMessage !== "string") {
         return res.status(400).json({
             success: false,
-            error: "Invalid field: extractedMessage must be a string.",
+            error: "Missing or invalid field: extractedMessage must be a string.",
         });
     }
 
-
-    // Validate file type
-    if (
-        req.file.mimetype !== "text/plain" &&
-        !req.file.originalname.toLowerCase().endsWith(".txt")
-    ) {
-        return res.status(400).json({
-            success: false,
-            error: "Invalid file: originalFile must be a .txt file.",
-        });
-    }
-
-
-    // Read original message from file
-    const originalMessage =
-        req.file.buffer
-            .toString("utf-8")
+    // Normalize both messages consistently
+    const normalizeMessage = (message: string) =>
+        message
             .replace(/\r\n/g, "\n")
             .replace(/\r/g, "\n")
             .trim();
 
-    const normalizedExtractedMessage =
-        extractedMessage
-            .replace(/\r\n/g, "\n")
-            .replace(/\r/g, "\n")
-            .trim();
-
-    // Compare
     const request: CompareRequest = {
-        originalMessage,
-        extractedMessage: normalizedExtractedMessage,
+        originalMessage: normalizeMessage(originalMessage),
+        extractedMessage: normalizeMessage(extractedMessage),
     };
 
     const comparison = compareMessages(request);

@@ -1,5 +1,11 @@
-import { FileText, Upload, X, ClipboardPaste } from "lucide-react";
-import { useRef, useState } from "react";
+import {
+    FileText,
+    Upload,
+    X,
+    ClipboardPaste,
+} from "lucide-react";
+
+import { useId, useRef, useState } from "react";
 import "../../styles/CompareDashboard.css";
 
 interface CompareTextUploadProps {
@@ -9,7 +15,6 @@ interface CompareTextUploadProps {
     onFileChange: (file: File | null) => void;
     text: string;
     onTextChange: (text: string) => void;
-    allowPaste?: boolean;
 }
 
 type InputMode = "upload" | "paste";
@@ -21,9 +26,10 @@ export const CompareTextUpload = ({
     onFileChange,
     text,
     onTextChange,
-    allowPaste = false,
 }: CompareTextUploadProps) => {
     const inputRef = useRef<HTMLInputElement>(null);
+    const textareaId = useId();
+
     const [inputMode, setInputMode] = useState<InputMode>("upload");
 
     const handleFileChange = (
@@ -44,6 +50,7 @@ export const CompareTextUpload = ({
 
         onFileChange(selectedFile);
         onTextChange("");
+
         event.target.value = "";
     };
 
@@ -58,7 +65,6 @@ export const CompareTextUpload = ({
     const handleModeChange = (mode: InputMode) => {
         setInputMode(mode);
 
-        // Clear the inactive input to avoid ambiguity.
         if (mode === "upload") {
             onTextChange("");
         } else {
@@ -83,35 +89,33 @@ export const CompareTextUpload = ({
                 </div>
             </div>
 
-            {allowPaste && (
-                <div
-                    className="compare-input-switch"
-                    role="group"
-                    aria-label="Choose extracted message input method"
+            <div
+                className="compare-input-switch"
+                role="group"
+                aria-label={`Choose ${title} input method`}
+            >
+                <button
+                    type="button"
+                    className={inputMode === "upload" ? "active" : ""}
+                    aria-pressed={inputMode === "upload"}
+                    onClick={() => handleModeChange("upload")}
                 >
-                    <button
-                        type="button"
-                        className={inputMode === "upload" ? "active" : ""}
-                        aria-pressed={inputMode === "upload"}
-                        onClick={() => handleModeChange("upload")}
-                    >
-                        <Upload size={16} />
-                        Upload file
-                    </button>
+                    <Upload size={16} />
+                    Upload file
+                </button>
 
-                    <button
-                        type="button"
-                        className={inputMode === "paste" ? "active" : ""}
-                        aria-pressed={inputMode === "paste"}
-                        onClick={() => handleModeChange("paste")}
-                    >
-                        <ClipboardPaste size={16} />
-                        Paste text
-                    </button>
-                </div>
-            )}
+                <button
+                    type="button"
+                    className={inputMode === "paste" ? "active" : ""}
+                    aria-pressed={inputMode === "paste"}
+                    onClick={() => handleModeChange("paste")}
+                >
+                    <ClipboardPaste size={16} />
+                    Paste text
+                </button>
+            </div>
 
-            {(!allowPaste || inputMode === "upload") && (
+            {inputMode === "upload" && (
                 <>
                     {file ? (
                         <div className="compare-selected-file">
@@ -119,7 +123,9 @@ export const CompareTextUpload = ({
 
                             <div className="compare-file-details">
                                 <strong>{file.name}</strong>
-                                <span>{(file.size / 1024).toFixed(1)} KB</span>
+                                <span>
+                                    {(file.size / 1024).toFixed(1)} KB
+                                </span>
                             </div>
 
                             <button
@@ -152,17 +158,19 @@ export const CompareTextUpload = ({
                 onChange={handleFileChange}
             />
 
-            {allowPaste && inputMode === "paste" && (
+            {inputMode === "paste" && (
                 <div className="compare-paste-section">
-                    <label htmlFor="extracted-message-text">
-                        Extracted message
+                    <label htmlFor={textareaId}>
+                        {title}
                     </label>
 
                     <textarea
-                        id="extracted-message-text"
+                        id={textareaId}
                         value={text}
-                        onChange={(event) => onTextChange(event.target.value)}
-                        placeholder="Paste your extracted message here..."
+                        onChange={(event) =>
+                            onTextChange(event.target.value)
+                        }
+                        placeholder={`Paste your ${title.toLowerCase()} here...`}
                         rows={7}
                     />
                 </div>

@@ -8,6 +8,8 @@ export const CompareDashboard = () => {
     const {
         originalFile,
         setOriginalFile,
+        originalText,
+        setOriginalText,
         extractedFile,
         setExtractedFile,
         extractedText,
@@ -22,6 +24,12 @@ export const CompareDashboard = () => {
     const result =
         compareResponse?.success ? compareResponse.result : null;
 
+    const hasOriginalInput =
+        originalFile !== null || originalText.trim().length > 0;
+
+    const hasExtractedInput =
+        extractedFile !== null || extractedText.trim().length > 0;
+
     return (
         <main className="compare-dashboard">
             <header className="compare-page-header">
@@ -32,18 +40,16 @@ export const CompareDashboard = () => {
                         message to measure its accuracy.
                     </div>
                 </div>
-
             </header>
-
 
             <div className="compare-upload-grid">
                 <CompareTextUpload
                     title="Original Message"
-                    description="Upload the original secret text file."
+                    description="Upload the original secret text file or paste its contents."
                     file={originalFile}
                     onFileChange={setOriginalFile}
-                    text=""
-                    onTextChange={() => { }}
+                    text={originalText}
+                    onTextChange={setOriginalText}
                 />
 
                 <CompareTextUpload
@@ -53,7 +59,6 @@ export const CompareDashboard = () => {
                     onFileChange={setExtractedFile}
                     text={extractedText}
                     onTextChange={setExtractedText}
-                    allowPaste
                 />
             </div>
 
@@ -70,8 +75,8 @@ export const CompareDashboard = () => {
                     onClick={handleCompare}
                     disabled={
                         isComparing ||
-                        !originalFile ||
-                        (!extractedFile && !extractedText.trim())
+                        !hasOriginalInput ||
+                        !hasExtractedInput
                     }
                 >
                     {isComparing ? (

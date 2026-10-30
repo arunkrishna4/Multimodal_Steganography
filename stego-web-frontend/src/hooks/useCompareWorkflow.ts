@@ -1,21 +1,23 @@
-// src/hooks/useCompareWorkflow.ts
-
 import { useState } from "react";
-import { compareMessages } from "../api/compare.api";
+import { compareTextMessages } from "../api/compare.api";
 import type { CompareResponse } from "../types/api/compare";
 
 export const useCompareWorkflow = () => {
     const [originalFile, setOriginalFile] = useState<File | null>(null);
+    const [originalText, setOriginalText] = useState("");
+
     const [extractedFile, setExtractedFile] = useState<File | null>(null);
     const [extractedText, setExtractedText] = useState("");
+
     const [isComparing, setIsComparing] = useState(false);
     const [error, setError] = useState("");
+
     const [compareResponse, setCompareResponse] =
         useState<CompareResponse | null>(null);
 
     const handleCompare = async () => {
-        if (!originalFile) {
-            setError("Please upload the original text file.");
+        if (!originalFile && !originalText.trim()) {
+            setError("Please upload or paste the original message.");
             return;
         }
 
@@ -29,18 +31,24 @@ export const useCompareWorkflow = () => {
         setCompareResponse(null);
 
         try {
-            const message = extractedFile
+            // Read file contents when files are selected.
+            const originalMessage = originalFile
+                ? await originalFile.text()
+                : originalText;
+
+            const extractedMessage = extractedFile
                 ? await extractedFile.text()
                 : extractedText;
 
-            const response = await compareMessages(originalFile, message);
+            const response = await compareTextMessages(
+                originalMessage,
+                extractedMessage,
+            );
 
-            if (response.success === false) {
+            if (response.success == false) {
                 setError(response.error);
                 return;
             }
-
-            setCompareResponse(response);
 
             setCompareResponse(response);
         } catch {
@@ -52,8 +60,11 @@ export const useCompareWorkflow = () => {
 
     const clearComparison = () => {
         setOriginalFile(null);
+        setOriginalText("");
+
         setExtractedFile(null);
         setExtractedText("");
+
         setCompareResponse(null);
         setError("");
     };
@@ -61,13 +72,18 @@ export const useCompareWorkflow = () => {
     return {
         originalFile,
         setOriginalFile,
+        originalText,
+        setOriginalText,
+
         extractedFile,
         setExtractedFile,
         extractedText,
         setExtractedText,
+
         isComparing,
         error,
         compareResponse,
+
         handleCompare,
         clearComparison,
     };

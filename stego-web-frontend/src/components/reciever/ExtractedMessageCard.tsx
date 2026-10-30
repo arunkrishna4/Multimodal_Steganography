@@ -158,9 +158,9 @@ export const ExtractedMessageCard = ({
       </div>
 
       {/* Original Message */}
-      <div className="original-message-upload">
+      {/* <div className="original-message-upload"> */}
 
-        <SecretFileUpload
+      {/* <SecretFileUpload
           file={originalFile}
           onUpload={onOriginalFileUpload}
           title="Upload original secret message"
@@ -169,10 +169,10 @@ export const ExtractedMessageCard = ({
           readyLabel="Ready to compare"
         />
 
-      </div>
+      </div> */}
 
       {/* Compare */}
-      <div className="compare-message-section">
+      {/* <div className="compare-message-section">
 
         <div>
           <h3>Verify the extracted message</h3>
@@ -212,7 +212,7 @@ export const ExtractedMessageCard = ({
           )}
         </button>
 
-      </div>
+      </div> */}
 
     </section>
   );
