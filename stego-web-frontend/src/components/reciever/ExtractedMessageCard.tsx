@@ -1,6 +1,5 @@
 import { CheckCircle2, Copy, FileText, Files, FileDown, LoaderCircle } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-import { SecretFileUpload } from "../sender/SecretFileUpload";
 import "../../styles/ExtractedMessageCard.css";
 
 interface ExtractedMessageCardProps {
@@ -23,14 +22,10 @@ interface ExtractedMessageCardProps {
 export const ExtractedMessageCard = ({
   message,
   totalParts,
-  originalFile,
-  onOriginalFileUpload,
-  onCompare,
+
   onDownload,
   isDownloading = false,
-  disabled = false,
-  isComparing = false,
-  hasOriginalFile = false,
+
 }: ExtractedMessageCardProps) => {
   const [copied, setCopied] = useState(false);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -61,7 +56,7 @@ export const ExtractedMessageCard = ({
     }
   };
 
-  const isCompleted = disabled && hasOriginalFile && !isComparing;
+
 
   return (
     <section className="extracted-message-card">
